@@ -1,0 +1,15 @@
+.progress{
+    height: 35px;
+    margin: 1% 1%;
+}
+
+th{
+    text-align: center;
+}
+
+td{
+    text-align: center;
+}
+
+nav ul{height:268px;} 
+nav ul{overflow:hidden; overflow-y:scroll;}
