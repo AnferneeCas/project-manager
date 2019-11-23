@@ -1,0 +1,31 @@
+.card{
+   
+    background-color: #BBC5CC;
+}
+
+.task-card{
+    position: fixed; 
+}
+
+.modal-backdrop{
+    display: none;
+}
+
+th{
+    text-align: center;
+    
+}
+
+table td{
+    text-align: center;
+     vertical-align: middle !important;
+}
+
+p{
+    justify-content: left;
+    word-wrap: break-word;
+    color: black;
+}
+.modal-title{
+    color: black;
+}

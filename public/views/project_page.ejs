@@ -20,7 +20,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="./dashboard_employee.html">Dashboard</a>
+                    <a href="/">Dashboard</a>
                 </li>
                 <li>
                     <a href="#">Projects</a>
@@ -79,13 +79,17 @@
                                             <nav>
                                                     <ul class="list-group">
                                                             <li class="list-group-item disabled" aria-disabled="true">TEAM MEMBERS</li>
-                                                            <li class="list-group-item">Anfernee Castillo</li>
+                                                         <% obj.teammembers.forEach(function(member){ %>
+                                                            <li class="list-group-item"><%= member.name%></li>
+
+                                                         <%})%>
+                                                            <!-- <li class="list-group-item">Anfernee Castillo</li>
                                                             <li class="list-group-item">Arturo Rendon</li>
                                                             <li class="list-group-item">Alberto Lopez</li>
                                                             <li class="list-group-item">Andres Lopez</li>
                                                             <li class="list-group-item">Angel Guevara</li>
                                                             <li class="list-group-item">Rodrigo Bardales</li>
-                                                            <li class="list-group-item">Hector Tabora</li>
+                                                            <li class="list-group-item">Hector Tabora</li> -->
                                                      </ul>
                                                 </nav>
                                     </div>
@@ -102,44 +106,25 @@
                                     <table class="table table-hover table-dark">
                                             <thead>
                                               <tr>
-                                                <th scope="col" style="text-align: center;">#</th>
+                                                <th scope="col" style="text-align: center;">Id</th>
                                                 <th scope="col" style="text-align: center;">Owner</th>
                                                 <th scope="col" style="text-align: center;">Title</th>
                                                 <th scope="col" style="text-align: center;">Status</th>
                                               </tr>
                                             </thead>
                                             <tbody>
-                                              <tr onclick="document.location = 'task_page.html'">
-                                                  <th scope="row">1</th>
-                                                  <td>Arthur</td>
-                                                  <td>Create login</td>
-                                                  <td>
-                                                          <span class="badge badge-warning">Warning</span>
-                                                  </td>
-                                                
-                                                
-                                              </tr>
-                                              <tr onclick="document.location = 'task_page.html'">
-                                                <th scope="row">2</th>
-                                                <td>Anfer</td>
-                                                <td>Hack the system</td>
-                                                <td>
-                                                    <span class="badge badge-primary">Primary</span>
-                                                    <span class="badge badge-secondary">Secondary</span>
-                                                    <span class="badge badge-success">Success</span>
-                                                    <span class="badge badge-danger">Danger</span>       
-                                                </td>
-                                              </tr onclick="document.location = 'task_page.html'">
-                                              <tr>
-                                                <th scope="row">3</th>
-                                                <td>Larry</td>
-                                                <td>ata</td>
-                                                <td>
-                                                        <span class="badge badge-info">Info</span>
-                                                        <span class="badge badge-light">Light</span>
-                                                        <span class="badge badge-dark">Dark</span>
-                                                </td>
-                                              </tr>
+                                                <% obj.taskhistory.forEach(function(task){ %>
+                                                    <tr onclick="document.location ='/task-page/<%=task.id%>'">
+                                                    <th scope="row"><%= task.id%></th>
+                                                    <td><%= task.owner%></td>
+                                                    <td><%= task.title%></td>
+                                                    <td>
+                                                        <%if(task.status=='warning'){%>
+                                                            <span class="badge badge-warning">Warning</span>
+                                                        <%}%>
+                                                    </td> 
+                                                <%})%>
+                                             
                                             </tbody>
                                           </table>
                             </div>
