@@ -26,21 +26,11 @@ app.get('/', function (req, res) {
     //buscar obj en la base de datos, segun el id del user logged 
     //(el id del user logged debe guardarse en los cookies al momento de iniciar sesion)
     var obj = {
-<<<<<<< HEAD
         projects_count:5,
         tasks_count:10,
         bugs_count:12,
         projects:[{title:"Proyecto1",description:"El proyecto dqu",projectimage:"logo1.png",projectid:"projecto1"},
-        {title:"Hector",description:"HECTOR PRESI",projectimage:"logo1.png",projectid:"hector"}],
-        test:"fsdfa"
-=======
-        projects_count: 5,
-        tasks_count: 10,
-        bugs_count: 12,
-        projects: [{ title: "Proyecto1", description: "El proyecto dqu", projectimage: "logo1.png", projectid: "projecto1" },
-        { title: "Hector", description: "HECTOR PRESI", projectimage: "logo1.png", projectid: "hector" },
-        { title: "Arturo", description: "SOY GUAPO", projectimage: "logo1.png", projectid: "arturo_esta_bueno" }]
->>>>>>> 6fd2d0ea255451b28b5422ebae2ac24852f55908
+        {title:"Hector",description:"HECTOR PRESI",projectimage:"logo1.png",projectid:"hector"}]
     }
 
     res.render('dashboard', { obj: obj })
