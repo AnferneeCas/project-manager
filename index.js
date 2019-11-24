@@ -15,7 +15,8 @@ app.get('/',function(req,res){
         tasks_count:10,
         bugs_count:12,
         projects:[{title:"Proyecto1",description:"El proyecto dqu",projectimage:"logo1.png",projectid:"projecto1"},
-        {title:"Hector",description:"HECTOR PRESI",projectimage:"logo1.png",projectid:"hector"}]
+        {title:"Hector",description:"HECTOR PRESI",projectimage:"logo1.png",projectid:"hector"}],
+        test:"fsdfa"
     }
 
 
