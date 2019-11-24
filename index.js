@@ -67,5 +67,70 @@ app.get("/task-page/:taskid",function(req,res){
 });
 
 
+app.get("/tasks",function(req,res){
+
+    var obj={
+        tasks:[
+            {
+                projectid:"1",
+                projecttitle:"The project name",
+                taskid:"2",
+                tasktitle:"This is a task",
+                taskdescription:"This is a description",
+                currentstatus:"process"
+            },
+            {
+                projectid:"1",
+                projecttitle:"The project name",
+                taskid:"2",
+                tasktitle:"This is a task",
+                taskdescription:"This is a description",
+                currentstatus:"process"
+            },
+            {
+                projectid:"1",
+                projecttitle:"The project name",
+                taskid:"2",
+                tasktitle:"This is a task",
+                taskdescription:"This is a description",
+                currentstatus:"process"
+            },
+            {
+                projectid:"1",
+                projecttitle:"The project name",
+                taskid:"2",
+                tasktitle:"This is a task",
+                taskdescription:"This is a description",
+                currentstatus:"process"
+            },
+            {
+                projectid:"1",
+                projecttitle:"The project name",
+                taskid:"2",
+                tasktitle:"This is a task",
+                taskdescription:"This is a description",
+                currentstatus:"process"
+            },
+            {
+                projectid:"1",
+                projecttitle:"The project name",
+                taskid:"2",
+                tasktitle:"This is a task",
+                taskdescription:"This is a description",
+                currentstatus:"process"
+            },
+            {
+                projectid:"1",
+                projecttitle:"The project name",
+                taskid:"2",
+                tasktitle:"This is a task",
+                taskdescription:"This is a description",
+                currentstatus:"process"
+            }
+        ]
+    }
+    res.render('tasks',{obj:obj});
+});
+
 
 app.listen(3000);
