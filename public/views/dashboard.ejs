@@ -1,131 +1,135 @@
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="stylesheets/dashboard_employee.css">
-    <link rel="stylesheet" href="stylesheets/basic_template.css">
-    <title>Dashboard</title>
+  <meta charset="UTF-8">
+  <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="stylesheets/dashboard_employee.css">
+  <link rel="stylesheet" href="stylesheets/basic_template.css">
+  <title>Dashboard</title>
 </head>
+
 <body>
-    <div id="wrapper">
+  <div id="wrapper">
 
-        <!-- Sidebar -->
-        <div id="sidebar-wrapper">
-            <ul class="sidebar-nav">
-                <li class="sidebar-brand">
-                    <a href="#">
-                        DASHBOARD
-                    </a>
-                </li>
-                <li>
-                    <a href="/">Dashboard</a>
-                </li>
-                <li>
-                    <a href="#">Projects</a>
-                </li>
-                <li>
-                    <a href="/tasks">Tasks</a>
-                </li>
-                <li>
-                    <a href="#">Logout</a>
-                </li>
-                
-            </ul>
-        </div>
-        <!-- /#sidebar-wrapper -->
+    <!-- Sidebar -->
+    <div id="sidebar-wrapper">
+      <ul class="sidebar-nav">
+        <li class="sidebar-brand">
+          <a href="#">
+            DASHBOARD
+          </a>
+        </li>
+        <li>
+          <a href="/">Dashboard</a>
+        </li>
+        <li>
+          <a href="#">Projects</a>
+        </li>
+        <li>
+          <a href="/tasks">Tasks</a>
+        </li>
+        <li>
+          <a href="#">Logout</a>
+        </li>
 
-        <!-- Page Content -->
-        <div id="page-content-wrapper">
-            <div class="container-fluid">
-                <div class="row justify-content-center">
-                    <!-- <div class="col-lg-12">
+      </ul>
+    </div>
+    <!-- /#sidebar-wrapper -->
+
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+      <div class="container-fluid">
+        <div class="row justify-content-center">
+          <!-- <div class="col-lg-12">
                         <h1>Simple Sidebar</h1>
                         <p>This template has a responsive menu toggling system. The menu will appear collapsed on smaller screens, and will appear non-collapsed on larger screens. When toggled using the button below, the menu will appear/disappear. On small screens, the page content will be pushed off canvas.</p>
                         <p>Make sure to keep all page content within the <code>#page-content-wrapper</code>.</p>
                         <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Toggle Menu</a>
                     </div> -->
-                    <div class="card mb-3" style="max-width: 300px; margin-right: 5%;">
-                        <div class="row no-gutters">
-                          <div class="col-md-4">
-                            <img src="../images/projects_icon.png" class="card-img" alt="...">
-                          </div>
-                          <div class="col-md-8">
-                            <div class="card-body">
-                              <h5 class="card-title">Projects</h5>
-                              <h1> <%= obj.projects_count %></h1>
-                              <!-- <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+          <div class="card mb-3" style="max-width: 300px; margin-right: 5%;">
+            <div class="row no-gutters">
+              <div class="col-md-4">
+                <img src="../images/projects_icon.png" class="card-img" alt="...">
+              </div>
+              <div class="col-md-8">
+                <div class="card-body">
+                  <h5 class="card-title">Projects</h5>
+                  <h1> <%= obj.projects_count %></h1>
+                  <!-- <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
                               <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="card mb-3" style="max-width: 300px; margin-right: 5%;">
-                        <div class="row no-gutters">
-                          <div class="col-md-4">
-                            <img src="../images/tasks_icon.png" class="card-img" alt="...">
-                          </div>
-                          <div class="col-md-8">
-                            <div class="card-body">
-                              <h5 class="card-title">Tasks</h5>
-                              <h1><%= obj.tasks_count %></h1>
-                              <!-- <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                              <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="card mb-3" style="max-width: 300px; margin-right: 5%;">
-                        <div class="row no-gutters">
-                          <div class="col-md-4">
-                            <img src="../images/error_icon.png" class="card-img" alt="...">
-                          </div>
-                          <div class="col-md-8">
-                            <div class="card-body">
-                              <h5 class="card-title">Bugs</h5>
-                              <h1><%= obj.bugs_count %></h1>
-                              <!-- <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                              <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-
-                
-                    </div>
-
-
-                    <div class="row"style="margin-top: 10%;" >
-                        <div class="container-fluid">
-                            <div class="row justify-content-center">
-
-                              <% obj.projects.forEach(function(project){ %>
-                                
-                                <div class="card project-card" style="width: 18rem;">
-                                  <img src="../images/<%=project.projectimage%>" class="card-img-top" alt="...">
-                                  <div class="card-body">
-                                    <h5 class="card-title"><%=project.title%></h5>
-                                    <p class="card-text"><%=project.description%></p>
-                                    <a href="./project-page/<%=project.projectid%>" class="btn btn-primary">View project</a>
-                                  </div>
-                                </div>
-
-                               <% })%> 
-                                
-
-                                                                          
-                            </div>
-                        </div>
-                    </div>
+                </div>
+              </div>
             </div>
-        </div>
-        <!-- /#page-content-wrapper -->
+          </div>
 
+          <div class="card mb-3" style="max-width: 300px; margin-right: 5%;">
+            <div class="row no-gutters">
+              <div class="col-md-4">
+                <img src="../images/tasks_icon.png" class="card-img" alt="...">
+              </div>
+              <div class="col-md-8">
+                <div class="card-body">
+                  <h5 class="card-title">Tasks</h5>
+                  <h1><%= obj.tasks_count %></h1>
+                  <!-- <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                              <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card mb-3" style="max-width: 300px; margin-right: 5%;">
+            <div class="row no-gutters">
+              <div class="col-md-4">
+                <img src="../images/error_icon.png" class="card-img" alt="...">
+              </div>
+              <div class="col-md-8">
+                <div class="card-body">
+                  <h5 class="card-title">Bugs</h5>
+                  <h1><%= obj.bugs_count %></h1>
+                  <!-- <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                              <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+        </div>
+
+
+        <div class="row" style="margin-top: 10%;">
+          <div class="container-fluid">
+            <div class="row justify-content-center">
+
+              <% obj.projects.forEach(function(project){ %>
+
+              <div class="card project-card" style="width: 18rem;">
+                <img src="../images/<%=project.projectimage%>" class="card-img-top" alt="...">
+                <div class="card-body">
+                  <h5 class="card-title"><%=project.title%></h5>
+                  <p class="card-text"><%=project.description%></p>
+                  <a href="./project-page/<%=project.projectid%>" class="btn btn-primary">View project</a>
+                </div>
+              </div>
+
+              <% })%>
+
+
+
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <!-- /#wrapper -->
+    <!-- /#page-content-wrapper -->
+
+  </div>
+  <!-- /#wrapper -->
 </body>
+
 </html>

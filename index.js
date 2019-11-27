@@ -6,15 +6,51 @@ const express = require('express'),
         user: 'admin',
         password: 'anfer2325',
         port: '3306',
-        database: 'edbd'
+        database: 'ebdb'
     })
 
-connection.connect((err) => {
+connection.connect(async (err) => {
     if (err)
-        console.log('Connection failed')
+        console.log(err)
     else
         console.log('Connected')
 })
+
+async function getProjectNameByID(x) {
+    var pName
+    await connection.query('SELECT p.Project_Name FROM ebdb.Project p WHERE p.Project_ID = ' + x + ';', (err, results, fields) => {
+        if (err) throw err
+        pName = results[0].Project_Name
+        console.log(pName)
+        return pName
+    })
+}
+
+// This is an insert template for the Project table
+// INSERT INTO ebdb.Project (Project_State, Project_DataBase, FrontEnd_Tech, BackEnd_Tech, 
+//     Project_Name, Start_Date, Deliver_Date, Order_ID, Order_Price, Client_ID)
+//     VALUES ('In Process', 'MySQL', 'HTML, Bootstrap', 'NodeJS, Express',
+//     'HECTOR PRESI', '26-11-19', '26-11-20', '1200', 20000.99, 
+//     (SELECT c.Client_ID FROM ebdb.Client c WHERE c.Client_Name = 'Arturo Rendon'));
+
+var Employees
+connection.query('SELECT * FROM ebdb.Employees;', (err, results, fields) => {
+    if (err) throw err
+    Employees = results
+})
+
+var Projects
+connection.query('SELECT * FROM ebdb.Project;', (err, results, fields) => {
+    if (err) throw err
+    Projects = results
+})
+
+var Tasks
+connection.query('SELECT * FROM ebdb.Tasks;', (err, results, fields) => {
+    if (err) throw err
+    Tasks = results
+})
+
 
 //ejs
 app.use(express.static(__dirname + '/public'))
@@ -25,12 +61,22 @@ app.get('/', function (req, res) {
     //NOTA MOSTRAR PAGINA SIEMPRE Y CUANDO EXISTA UN USUARIO LOGGED 
     //buscar obj en la base de datos, segun el id del user logged 
     //(el id del user logged debe guardarse en los cookies al momento de iniciar sesion)
+
+    var pPage = [];
+    for (var i = 0; i < Projects.length; i++) {
+        pPage.push({
+            title: Projects[i].Project_Name,
+            description: Projects[i].Project_DataBase,
+            projectimage: 'logo1.png',
+            projectid: Projects[i].Project_ID
+        })
+    }
+
     var obj = {
-        projects_count:5,
-        tasks_count:10,
-        bugs_count:12,
-        projects:[{title:"Proyecto1",description:"El proyecto dqu",projectimage:"logo1.png",projectid:"projecto1"},
-        {title:"Hector",description:"HECTOR PRESI",projectimage:"logo1.png",projectid:"hector"}]
+        projects_count: 5,
+        tasks_count: 10,
+        bugs_count: 12,
+        projects: pPage
     }
 
     res.render('dashboard', { obj: obj })
@@ -44,6 +90,15 @@ app.get('/project-page/:projectid', function (req, res) {
     //el projectid viene de parametro en la request al servidor)
 
     //object segun id
+
+    var members = [];
+    for (var i = 0; i < Employees.length; i++) {
+        members.push({
+            name: Employees[i].Employee_Name,
+            id: Employees[i].Employee_ID
+        })
+    }
+
     var obj = {
         projectimage: "logo1.png",
         projecttitle: "Titulo",
@@ -54,7 +109,7 @@ app.get('/project-page/:projectid', function (req, res) {
         progressbar: 0,
         taskbar: 0,
         bugbar: 0,
-        teammembers: [{ name: "Anfernee Castillo", id: "123" }, { name: "Arturo Rendon", id: "456" }],
+        teammembers: members,
         taskhistory: [{ id: 1, owner: "Anfernee castillo", title: "Create login", status: "warning" }, { id: 1, owner: "Anfernee castillo", title: "Create login", status: "done" }]
     }
 
@@ -79,68 +134,22 @@ app.get("/task-page/:taskid", function (req, res) {
     res.render('task_page', { obj: obj })
 })
 
+app.get("/tasks", async function (req, res) {
 
-app.get("/tasks", function (req, res) {
+    var TasksForTaskList = [];
+    for (var i = 0; i < Tasks.length; i++) {
+        TasksForTaskList.push({
+            projectid: Tasks[i].Project_ID,
+            projecttitle: getProjectNameByID(Tasks[i].Project_ID),
+            taskid: Tasks[i].Task_ID,
+            tasktitle: Tasks[i].Task_Name,
+            tasksdescription: Tasks[i].Task_Instructions,
+            currentstatus: 'In Process'
+        })
+    }
 
     var obj = {
-        tasks: [
-            {
-                projectid: "1",
-                projecttitle: "The project name",
-                taskid: "2",
-                tasktitle: "This is a task",
-                taskdescription: "This is a description",
-                currentstatus: "process"
-            },
-            {
-                projectid: "1",
-                projecttitle: "The project name",
-                taskid: "2",
-                tasktitle: "This is a task",
-                taskdescription: "This is a description",
-                currentstatus: "process"
-            },
-            {
-                projectid: "1",
-                projecttitle: "The project name",
-                taskid: "2",
-                tasktitle: "This is a task",
-                taskdescription: "This is a description",
-                currentstatus: "process"
-            },
-            {
-                projectid: "1",
-                projecttitle: "The project name",
-                taskid: "2",
-                tasktitle: "This is a task",
-                taskdescription: "This is a description",
-                currentstatus: "process"
-            },
-            {
-                projectid: "1",
-                projecttitle: "The project name",
-                taskid: "2",
-                tasktitle: "This is a task",
-                taskdescription: "This is a description",
-                currentstatus: "process"
-            },
-            {
-                projectid: "1",
-                projecttitle: "The project name",
-                taskid: "2",
-                tasktitle: "This is a task",
-                taskdescription: "This is a description",
-                currentstatus: "process"
-            },
-            {
-                projectid: "1",
-                projecttitle: "The project name",
-                taskid: "2",
-                tasktitle: "This is a task",
-                taskdescription: "This is a description",
-                currentstatus: "process"
-            }
-        ]
+        tasks: TasksForTaskList
     }
     res.render('tasks', { obj: obj })
 })
