@@ -7,7 +7,8 @@ const express = require('express'),
         password: 'anfer2325',
         port: '3306',
         database: 'ebdb'
-    })
+    }),
+    util = require('util')
 
 connection.connect(async (err) => {
     if (err)
@@ -16,15 +17,12 @@ connection.connect(async (err) => {
         console.log('Connected')
 })
 
-async function getProjectNameByID(x) {
-    var pName
-    await connection.query('SELECT p.Project_Name FROM ebdb.Project p WHERE p.Project_ID = ' + x + ';', (err, results, fields) => {
-        if (err) throw err
-        pName = results[0].Project_Name
-        console.log(pName)
-        return pName
-    })
-}
+connection.query= util.promisify(connection.query);
+
+
+
+
+
 
 // This is an insert template for the Project table
 // INSERT INTO ebdb.Project (Project_State, Project_DataBase, FrontEnd_Tech, BackEnd_Tech, 
@@ -134,25 +132,58 @@ app.get("/task-page/:taskid", function (req, res) {
     res.render('task_page', { obj: obj })
 })
 
-app.get("/tasks", async function (req, res) {
+app.get("/tasks",async  function (req, res) {
 
-    var TasksForTaskList = [];
-    for (var i = 0; i < Tasks.length; i++) {
-        TasksForTaskList.push({
-            projectid: Tasks[i].Project_ID,
-            projecttitle: getProjectNameByID(Tasks[i].Project_ID),
-            taskid: Tasks[i].Task_ID,
-            tasktitle: Tasks[i].Task_Name,
-            tasksdescription: Tasks[i].Task_Instructions,
-            currentstatus: 'In Process'
-        })
-    }
+ 
 
-    var obj = {
-        tasks: TasksForTaskList
-    }
-    res.render('tasks', { obj: obj })
+    // var TasksForTaskList = [];
+    // for (var i = 0; i < Tasks.length; i++) {
+    //     TasksForTaskList.push({
+    //         projectid: Tasks[i].Project_ID,
+    //         projecttitle: await getProjectNameByID(Tasks[i].Project_ID),
+    //         taskid: Tasks[i].Task_ID,
+    //         tasktitle: Tasks[i].Task_Name,
+    //         tasksdescription: Tasks[i].Task_Instructions,
+    //         currentstatus: 'In Process'
+    //     })
+    // }
+
+    // var obj = {
+    //     tasks: TasksForTaskList
+    // }
+    var tmp =  await  getTasks();
+    console.log('test');
+    res.render('tasks', { obj: tmp[0] })
 })
 
 
-app.listen(3000);
+app.listen(3000)
+
+
+
+
+
+
+
+
+async function getTasks() {
+   
+   var result = await connection.query('select t.Project_ID, t.Task_ID, t.Task_Name, p.Project_Name, t.Task_Instructions,t.Task_Requirements from Tasks t inner join Project p on p.Project_ID = t.Project_ID ;');
+   
+    console.log(result);
+    return result;
+}
+
+
+
+// <%obj.tasks.forEach(function(task){ %>
+//     <div class="card col-md-2" style="width: 18rem; margin: 20px;">
+//         <div class="card-body">
+//           <h5 class="card-title"><%=task.tasktitle%></h5>
+//           <h6 class="card-subtitle mb-2 text-muted">Project: <%=task.projecttitle%></h6>
+//           <p class="card-text"> <%= task.taskdescription%></p>
+//           <a href="/task-page/<%=task.taskid%>" class="card-link">View task</a>
+//           <a href="/project-page/<%=task.projectid%>" class="card-link">View project</a>
+//         </div>
+//       </div>
+// <%}) %>
