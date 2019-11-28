@@ -17,12 +17,16 @@ connection.connect(async (err) => {
         console.log('Connected')
 })
 
+<<<<<<< Updated upstream
 connection.query= util.promisify(connection.query);
 
 
 
 
 
+=======
+connection.query = util.promisify(connection.query);
+>>>>>>> Stashed changes
 
 // This is an insert template for the Project table
 // INSERT INTO ebdb.Project (Project_State, Project_DataBase, FrontEnd_Tech, BackEnd_Tech, 
@@ -55,6 +59,10 @@ app.use(express.static(__dirname + '/public'))
 app.set('view engine', 'ejs')
 app.set('views', './public/views')
 
+
+
+
+
 app.get('/', function (req, res) {
     //NOTA MOSTRAR PAGINA SIEMPRE Y CUANDO EXISTA UN USUARIO LOGGED 
     //buscar obj en la base de datos, segun el id del user logged 
@@ -74,11 +82,20 @@ app.get('/', function (req, res) {
         projects_count: 5,
         tasks_count: 10,
         bugs_count: 12,
+<<<<<<< Updated upstream
         projects: pPage
+=======
+        projects: [{ title: "Proyecto1", description: "El proyecto dqu", projectimage: "logo1.png", projectid: "projecto1" },
+        { title: "Hector", description: "HECTOR PRESI", projectimage: "logo1.png", projectid: "hector" }]
+>>>>>>> Stashed changes
     }
 
     res.render('dashboard', { obj: obj })
 })
+
+
+
+
 
 app.get('/project-page/:projectid', function (req, res) {
     //NOTA MOSTRAR PAGINA SIEMPRE Y CUANDO EXISTA UN USUARIO LOGGED y el usuarios sea miembre del proyecto
@@ -120,6 +137,10 @@ app.get('/project-page/:projectid', function (req, res) {
 
 })
 
+
+
+
+
 app.get("/task-page/:taskid", function (req, res) {
 
     var obj = {
@@ -157,6 +178,7 @@ app.get("/tasks",async  function (req, res) {
 })
 
 
+<<<<<<< Updated upstream
 app.listen(3000)
 
 
@@ -176,6 +198,46 @@ async function getTasks() {
 
 
 
+=======
+
+app.get("/tasks", async function (req, res) {
+
+    var TasksForTaskList = [];
+    var tmp = await getTasks();
+    for (var i = 0; i < Tasks.length; i++) {
+        TasksForTaskList.push({
+            projectid: tmp[i].Project_ID,
+            projecttitle: tmp[i].Project_Name,
+            taskid: tmp[i].Task_ID,
+            tasktitle: tmp[i].Task_Name,
+            tasksdescription: tmp[i].Task_Instructions,
+            currentstatus: tmp[i].Task_Status
+        })
+    }
+
+    var obj = {
+        tasks: TasksForTaskList
+    }
+
+    res.render('tasks', { obj: obj })
+})
+
+
+app.listen(3000)
+
+
+async function getTasks() {
+
+    var result = await connection.query('select t.Project_ID, t.Task_ID, t.Task_Status, t.Task_Name, p.Project_Name, t.Task_Instructions,t.Task_Requirements from Tasks t inner join Project p on p.Project_ID = t.Project_ID ;');
+
+    console.log(result);
+    return result;
+
+}
+
+
+
+>>>>>>> Stashed changes
 // <%obj.tasks.forEach(function(task){ %>
 //     <div class="card col-md-2" style="width: 18rem; margin: 20px;">
 //         <div class="card-body">
@@ -186,4 +248,8 @@ async function getTasks() {
 //           <a href="/project-page/<%=task.projectid%>" class="card-link">View project</a>
 //         </div>
 //       </div>
+<<<<<<< Updated upstream
 // <%}) %>
+=======
+// <%}) %>
+>>>>>>> Stashed changes
