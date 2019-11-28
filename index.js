@@ -22,34 +22,6 @@ connection.query= util.promisify(connection.query);
 
 
 
-
-
-// This is an insert template for the Project table
-// INSERT INTO ebdb.Project (Project_State, Project_DataBase, FrontEnd_Tech, BackEnd_Tech, 
-//     Project_Name, Start_Date, Deliver_Date, Order_ID, Order_Price, Client_ID)
-//     VALUES ('In Process', 'MySQL', 'HTML, Bootstrap', 'NodeJS, Express',
-//     'HECTOR PRESI', '26-11-19', '26-11-20', '1200', 20000.99, 
-//     (SELECT c.Client_ID FROM ebdb.Client c WHERE c.Client_Name = 'Arturo Rendon'));
-
-var Employees
-connection.query('SELECT * FROM ebdb.Employees;', (err, results, fields) => {
-    if (err) throw err
-    Employees = results
-})
-
-var Projects
-connection.query('SELECT * FROM ebdb.Project;', (err, results, fields) => {
-    if (err) throw err
-    Projects = results
-})
-
-var Tasks
-connection.query('SELECT * FROM ebdb.Tasks;', (err, results, fields) => {
-    if (err) throw err
-    Tasks = results
-})
-
-
 //ejs
 app.use(express.static(__dirname + '/public'))
 app.set('view engine', 'ejs')
@@ -60,16 +32,7 @@ app.get('/', function (req, res) {
     //buscar obj en la base de datos, segun el id del user logged 
     //(el id del user logged debe guardarse en los cookies al momento de iniciar sesion)
 
-    var pPage = [];
-    for (var i = 0; i < Projects.length; i++) {
-        pPage.push({
-            title: Projects[i].Project_Name,
-            description: Projects[i].Project_DataBase,
-            projectimage: 'logo1.png',
-            projectid: Projects[i].Project_ID
-        })
-    }
-
+    
     var obj = {
         projects_count: 5,
         tasks_count: 10,
@@ -89,13 +52,7 @@ app.get('/project-page/:projectid', function (req, res) {
 
     //object segun id
 
-    var members = [];
-    for (var i = 0; i < Employees.length; i++) {
-        members.push({
-            name: Employees[i].Employee_Name,
-            id: Employees[i].Employee_ID
-        })
-    }
+  
 
     var obj = {
         projectimage: "logo1.png",
@@ -134,22 +91,14 @@ app.get("/task-page/:taskid", function (req, res) {
 
 app.get("/tasks",async  function (req, res) {
 
- 
 
-    // var TasksForTaskList = [];
-    // for (var i = 0; i < Tasks.length; i++) {
-    //     TasksForTaskList.push({
-    //         projectid: Tasks[i].Project_ID,
+    // var obj = {
+    //       projectid: Tasks[i].Project_ID,
     //         projecttitle: await getProjectNameByID(Tasks[i].Project_ID),
     //         taskid: Tasks[i].Task_ID,
     //         tasktitle: Tasks[i].Task_Name,
     //         tasksdescription: Tasks[i].Task_Instructions,
     //         currentstatus: 'In Process'
-    //     })
-    // }
-
-    // var obj = {
-    //     tasks: TasksForTaskList
     // }
     var tmp =  await  getTasks();
     console.log('test');
@@ -175,15 +124,3 @@ async function getTasks() {
 }
 
 
-
-// <%obj.tasks.forEach(function(task){ %>
-//     <div class="card col-md-2" style="width: 18rem; margin: 20px;">
-//         <div class="card-body">
-//           <h5 class="card-title"><%=task.tasktitle%></h5>
-//           <h6 class="card-subtitle mb-2 text-muted">Project: <%=task.projecttitle%></h6>
-//           <p class="card-text"> <%= task.taskdescription%></p>
-//           <a href="/task-page/<%=task.taskid%>" class="card-link">View task</a>
-//           <a href="/project-page/<%=task.projectid%>" class="card-link">View project</a>
-//         </div>
-//       </div>
-// <%}) %>
