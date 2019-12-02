@@ -10,16 +10,14 @@ const express = require('express'),
     }),
     util = require('util')
 
-connection.connect(async (err) => {
+connection.connect((err) => {
     if (err)
         console.log(err)
     else
         console.log('Connected')
 })
 
-connection.query= util.promisify(connection.query);
-
-
+connection.query = util.promisify(connection.query);
 
 
 //ejs
@@ -27,15 +25,18 @@ app.use(express.static(__dirname + '/public'))
 app.set('view engine', 'ejs')
 app.set('views', './public/views')
 
-app.get('/', function (req, res) {
+app.get('/', async function (req, res) {
     //NOTA MOSTRAR PAGINA SIEMPRE Y CUANDO EXISTA UN USUARIO LOGGED 
     //buscar obj en la base de datos, segun el id del user logged 
     //(el id del user logged debe guardarse en los cookies al momento de iniciar sesion)
 
-    
+    var pPage = await connection.query('SELECT p.Project_Name AS title, p.Project_Description AS description, p.Project_Image AS projectimage, p.Project_ID AS projectid FROM ebdb.Project p;')
+    var pCount = await connection.query('SELECT COUNT(p.Project_ID) AS pc FROM ebdb.Project p;')
+    var tCount = await connection.query('SELECT COUNT(t.Task_ID) AS tc FROM ebdb.Tasks t;')
+
     var obj = {
-        projects_count: 5,
-        tasks_count: 10,
+        projects_count: pCount[0].pc,
+        tasks_count: tCount[0].tc,
         bugs_count: 12,
         projects: pPage
     }
@@ -43,7 +44,7 @@ app.get('/', function (req, res) {
     res.render('dashboard', { obj: obj })
 })
 
-app.get('/project-page/:projectid', function (req, res) {
+app.get('/project-page/:projectid', async function (req, res) {
     //NOTA MOSTRAR PAGINA SIEMPRE Y CUANDO EXISTA UN USUARIO LOGGED y el usuarios sea miembre del proyecto
 
     //el id del user logged tiene que ser miembro del projecto que se este solicitando (projectid) 
@@ -52,14 +53,19 @@ app.get('/project-page/:projectid', function (req, res) {
 
     //object segun id
 
-  
+    var members = await connection.query('SELECT e.Employee_Name AS name, e.Employee_ID AS id FROM ebdb.Employees e INNER JOIN ebdb.Project_x_Employee pe ON pe.Employee_ID = e.Employee_ID INNER JOIN ebdb.Project p ON pe.Project_ID = p.Project_ID WHERE p.Project_ID = ' + req.params.projectid + ';')
+    var pImage = await connection.query('SELECT p.Project_Image AS image FROM ebdb.Project p WHERE p.Project_ID = ' + req.params.projectid + ';')
+    var pTitle = await connection.query('SELECT p.Project_Name AS title FROM ebdb.Project p WHERE p.Project_ID = ' + req.params.projectid + ';')
+    var tasksNumber = await connection.query('SELECT COUNT(t.Task_ID) AS number FROM ebdb.Tasks t INNER JOIN ebdb.Project p ON p.Project_ID = t.Project_ID WHERE p.Project_ID = ' + req.params.projectid + ';')
+    var tasksDone = await connection.query("SELECT COUNT(t.Task_ID) AS tDone FROM ebdb.Tasks t WHERE t.Task_Status = 'Done' AND t.Project_ID = " + req.params.projectid + ";")
+    //var bugs = await connection.query('SELECT COUNT (b.Bug_Name) AS bNumber FROM ebdb.Bugs b INNER JOIN ebdb.Task_x_Bug tb ON tb.Bug_Name = b.Bug_Name INNER JOIN ebdb.Tasks t ON t.Task_ID = tb.Task_ID WHERE t.Project_ID = ' + req.params.projectid + ';')
 
     var obj = {
-        projectimage: "logo1.png",
-        projecttitle: "Titulo",
-        tasksnumber: 10,
-        tasksdone: 1,
-        bugsnumber: 5,
+        projectimage: pImage[0].image,
+        projecttitle: pTitle[0].title,
+        tasksnumber: tasksNumber[0].number,
+        tasksdone: tasksDone[0].tDone,
+        bugsnumber: 7,
         bugsfixed: 0,
         progressbar: 0,
         taskbar: 0,
@@ -89,7 +95,7 @@ app.get("/task-page/:taskid", function (req, res) {
     res.render('task_page', { obj: obj })
 })
 
-app.get("/tasks",async  function (req, res) {
+app.get("/tasks", async function (req, res) {
 
 
     // var obj = {
@@ -100,10 +106,14 @@ app.get("/tasks",async  function (req, res) {
     //         tasksdescription: Tasks[i].Task_Instructions,
     //         currentstatus: 'In Process'
     // }
-    var tmp =  await  getTasks();
+    var tmp = await getTasks();
     console.log('test');
     res.render('tasks', { obj: tmp[0] })
 })
+
+
+
+
 
 
 app.listen(3000)
@@ -116,9 +126,9 @@ app.listen(3000)
 
 
 async function getTasks() {
-   
-   var result = await connection.query('select t.Project_ID, t.Task_ID, t.Task_Name, p.Project_Name, t.Task_Instructions,t.Task_Requirements from Tasks t inner join Project p on p.Project_ID = t.Project_ID ;');
-   
+
+    var result = await connection.query('select t.Project_ID, t.Task_ID, t.Task_Name, p.Project_Name, t.Task_Instructions,t.Task_Requirements from Tasks t inner join Project p on p.Project_ID = t.Project_ID ;');
+
     console.log(result);
     return result;
 }
