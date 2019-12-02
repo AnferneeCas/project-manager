@@ -41,6 +41,14 @@ app.get('/', async function (req, res) {
         projects: pPage
     }
 
+    var obj={
+        projects_count: "23",
+        employees_count:"23",
+        projects : [
+            {project_image:"imagen",project_tasks:23,project_bugs:54,project_title:"this is ia title",project_description: "this is a description",project_id:"0023"}
+        ]
+
+    }
     res.render('dashboard', { obj: obj })
 })
 
