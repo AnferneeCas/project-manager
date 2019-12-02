@@ -1,3 +1,4 @@
+//Require
 const express = require('express'),
     app = express(),
     mysql = require('mysql'),
@@ -8,7 +9,17 @@ const express = require('express'),
         port: '3306',
         database: 'ebdb'
     }),
-    util = require('util')
+    util = require('util'),
+const jwt = require('jsonwebtoken')
+
+
+//Configuration and declaration
+const private_key = 'arturoyanfer'
+const payload = {
+    username: 'r2rendon',
+    email: 'r2rendon@gmail.com'
+}
+
 
 connection.connect((err) => {
     if (err)
