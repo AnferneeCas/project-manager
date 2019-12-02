@@ -1,3 +1,4 @@
+//Require
 const express = require('express'),
     app = express(),
     mysql = require('mysql'),
@@ -8,7 +9,17 @@ const express = require('express'),
         port: '3306',
         database: 'ebdb'
     }),
-    util = require('util')
+    util = require('util'),
+const jwt = require('jsonwebtoken')
+
+
+//Configuration and declaration
+const private_key = 'arturoyanfer'
+const payload = {
+    username: 'r2rendon',
+    email: 'r2rendon@gmail.com'
+}
+
 
 connection.connect((err) => {
     if (err)
@@ -66,7 +77,7 @@ app.get('/project-page/:projectid', async function (req, res) {
     var pTitle = await connection.query('SELECT p.Project_Name AS title FROM ebdb.Project p WHERE p.Project_ID = ' + req.params.projectid + ';')
     var tasksNumber = await connection.query('SELECT COUNT(t.Task_ID) AS number FROM ebdb.Tasks t INNER JOIN ebdb.Project p ON p.Project_ID = t.Project_ID WHERE p.Project_ID = ' + req.params.projectid + ';')
     var tasksDone = await connection.query("SELECT COUNT(t.Task_ID) AS tDone FROM ebdb.Tasks t WHERE t.Task_Status = 'Done' AND t.Project_ID = " + req.params.projectid + ";")
-    var bugs = await connection.query('SELECT COUNT (b.Bug_Name) AS bNumber FROM ebdb.Bugs b INNER JOIN ebdb.Task_x_Bug tb ON tb.Bug_Name = b.Bug_Name INNER JOIN ebdb.Tasks t ON t.Task_ID = tb.Task_ID WHERE t.Project_ID = ' + req.params.projectid + ';')
+    var bugs = await connection.query('SELECT COUNT(b.Bug_Name) AS bNumber FROM ebdb.Bugs b INNER JOIN ebdb.Task_x_Bug tb ON tb.Bug_Name = b.Bug_Name INNER JOIN ebdb.Tasks t ON t.Task_ID = tb.Task_ID WHERE t.Project_ID = ' + req.params.projectid + ';')
     var bugsFixed = await connection.query("SELECT COUNT(b.Bug_Name) AS unsolved FROM ebdb.Bugs b INNER JOIN ebdb.Task_x_Bug tb ON tb.Bug_Name = b.Bug_Name INNER JOIN ebdb.Tasks t on t.Task_ID = tb.Task_ID WHERE t.Task_ID = " + req.params.projectid + " AND b.Bug_Status = 'Solved';")
 
     var obj = {
