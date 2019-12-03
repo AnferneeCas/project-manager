@@ -9,7 +9,8 @@ const express = require('express'),
         port: '3306',
         database: 'ebdb'
     }),
-    util = require('util'),
+    util = require('util')
+
 const jwt = require('jsonwebtoken')
 
 
@@ -17,8 +18,14 @@ const jwt = require('jsonwebtoken')
 const private_key = 'arturoyanfer'
 const payload = {
     username: 'r2rendon',
-    email: 'r2rendon@gmail.com'
+    userType: 'E'
 }
+
+const token = jwt.sign(payload, private_key, { expiresIn: '1d' })
+console.log(token)
+
+var v = jwt.verify(token, private_key)
+console.log(v)
 
 
 connection.connect((err) => {
@@ -41,18 +48,26 @@ app.get('/', async function (req, res) {
     //buscar obj en la base de datos, segun el id del user logged 
     //(el id del user logged debe guardarse en los cookies al momento de iniciar sesion)
 
-    var pPage = await connection.query('SELECT p.Project_Name AS title, p.Project_Description AS description, p.Project_Image AS projectimage, p.Project_ID AS projectid FROM ebdb.Project p;')
-    var pCount = await connection.query('SELECT COUNT(p.Project_ID) AS pc FROM ebdb.Project p;')
-    var tCount = await connection.query('SELECT COUNT(t.Task_ID) AS tc FROM ebdb.Tasks t;')
+    console.log(req.cookies)
+    var c = req.cookies
+    if (c === undefined)
+        res.render('login')
+    else {
+        var pPage = await connection.query('SELECT p.Project_Name AS title, p.Project_Description AS description, p.Project_Image AS projectimage, p.Project_ID AS projectid FROM ebdb.Project p;')
+        var pCount = await connection.query('SELECT COUNT(p.Project_ID) AS pc FROM ebdb.Project p;')
+        var tCount = await connection.query('SELECT COUNT(t.Task_ID) AS tc FROM ebdb.Tasks t;')
+        var bugs = await connection.query('SELECT COUNT(b.Bug_Name) AS bCount FROM ebdb.Bugs b;')
 
-    var obj = {
-        projects_count: pCount[0].pc,
-        tasks_count: tCount[0].tc,
-        bugs_count: 12,
-        projects: pPage
+        var obj = {
+            projects_count: pCount[0].pc,
+            tasks_count: tCount[0].tc,
+            bugs_count: bugs[0].bCount,
+            projects: pPage
+        }
+
+        res.render('dashboard', { obj: obj })
     }
 
-    res.render('dashboard', { obj: obj })
 })
 
 app.get('/project-page/:projectid', async function (req, res) {
@@ -85,6 +100,10 @@ app.get('/project-page/:projectid', async function (req, res) {
         teammembers: members,
         taskhistory: [{ id: 1, owner: "Anfernee castillo", title: "Create login", status: "warning" }, { id: 1, owner: "Anfernee castillo", title: "Create login", status: "done" }]
     }
+
+    // var userQuery = await connection.query(`SELECT u.Username, u.Employee_ID, u.Client_ID, u.Manager FROM ebdb.Users u WHERE u.Username = '${'r2chinchilla'}' AND u.Password = '${'Hola'}';`)
+
+    // console.log(userQuery)
 
 
     //fix progress bar
@@ -123,6 +142,38 @@ app.get("/tasks", async function (req, res) {
     res.render('tasks', { obj: tmp[0] })
 })
 
+
+app.post('/', async function (req, res) {
+    var u = req.params.user
+
+    var userQuery = await connection.query(`SELECT u.User, u.Employee_ID, u.Client_ID, u.Manager FROM ebdb.Users u WHERE u.Username = '${u.user}' AND u.Password = ${u.password};`)
+
+    var pl;
+    if (userQuery[0].Employee_ID != null) {
+        pl = {
+            username: userQuery[0].User,
+            userType: 'E'
+        }
+
+        const uToken = jwt.sign(pl, private_key);
+        res.cookie(uToken)
+        res.redirect('/')
+
+    }
+    else if (userQuery[0].Client_ID != null) {
+        pl = {
+            username: userQuery[0].User,
+            userType: 'C'
+        }
+    }
+    else if (userQuery[0].Manager != null) {
+        pl = {
+            username: userQuery[0].User,
+            userType: 'M'
+        }
+    }
+
+})
 
 
 
