@@ -92,12 +92,12 @@ app.get('/', async function (req, res) {
         } else if (userLogged.userType == 'M') {
 
             var pCount = await connection.query('SELECT COUNT(p.Project_ID) AS pc FROM ebdb.Project p;')
-            var tCount = await connection.query('SELECT COUNT(t.Task_ID) AS tc FROM ebdb.Tasks t;')
-            var pPage = await connection.query('SELECT p.Project_Image AS projectimage FROM ebdb.Project p;')
+            var eCount = await connection.query('SELECT COUNT(t.Employee_ID) as ec FROM ebdb.Employees t;')
+            var pPage = await connection.query('SELECT p.Project_Image AS projectimage, p.Project_ID as projectid, p.Project_Name as title, p.Project_Description as description FROM ebdb.Project p;')
 
             var obj = {
                 projects_count: pCount[0].pc,
-                tasks_count: tCount[0].tc,
+                employees_count: eCount[0].ec,
                 projects: pPage
             }
 
@@ -230,7 +230,9 @@ app.post('/', async function (req, res) {
 })
 
 
-
+app.get('/pending-projects',function (req,res) {
+    res.render('manager_pending_projects');
+});
 
 
 app.listen(3000)
