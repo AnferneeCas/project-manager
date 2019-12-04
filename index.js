@@ -74,10 +74,11 @@ app.get('/', async function (req, res) {
 
         if (userLogged.userType == 'E') {
 
-            var pPage = await connection.query('SELECT p.Project_Name AS title, p.Project_Description AS description, p.Project_Image AS projectimage, p.Project_ID AS projectid FROM ebdb.Project p;')
-            var pCount = await connection.query('SELECT COUNT(p.Project_ID) AS pc FROM ebdb.Project p;')
-            var tCount = await connection.query('SELECT COUNT(t.Task_ID) AS tc FROM ebdb.Tasks t;')
-            var bugs = await connection.query('SELECT COUNT(b.Bug_Name) AS bCount FROM ebdb.Bugs b;')
+            var empID = await connection.query(`SELECT u.Employee_ID FROM ebdb.Users u WHERE u.Username = '${userLogged.username}'`);
+            var pPage = await connection.query(`SELECT p.Project_Name AS title, p.Project_Description AS description, p.Project_Image AS projectimage, p.Project_ID AS projectid FROM ebdb.Project p INNER JOIN ebdb.Project_x_Employee pe ON p.Project_ID = pe.Project_ID WHERE pe.Employee_ID = '${empID[0].Employee_ID}';`)
+            var pCount = await connection.query(`SELECT COUNT(p.Project_ID) AS pc FROM ebdb.Project p INNER JOIN ebdb.Project_x_Employee pe ON p.Project_ID = pe.Project_ID WHERE pe.Employee_ID = '${empID[0].Employee_ID}';`)
+            var tCount = await connection.query(`SELECT COUNT(t.Task_ID) AS tc FROM ebdb.Tasks t INNER JOIN ebdb.Task_x_Employee te ON te.Task_ID = t.Task_ID WHERE te.Employee_ID = ${empID[0].Employee_ID};`)
+            var bugs = await connection.query(`SELECT COUNT(b.Bug_Name) AS bCount FROM ebdb.Bugs b INNER JOIN ebdb.Task_x_Bug tb ON b.Bug_Name = tb.Bug_Name INNER JOIN ebdb.Tasks t ON tb.Task_ID = t.Task_ID INNER JOIN ebdb.Task_x_Employee te ON te.Task_ID = t.Task_ID WHERE te.Employee_ID = '${empID[0].Employee_ID}';`)
 
             var obj = {
                 projects_count: pCount[0].pc,
@@ -87,6 +88,20 @@ app.get('/', async function (req, res) {
             }
 
             res.render('dashboard', { obj: obj })
+
+        } else if (userLogged.userType == 'M') {
+
+            var pCount = await connection.query('SELECT COUNT(p.Project_ID) AS pc FROM ebdb.Project p;')
+            var tCount = await connection.query('SELECT COUNT(t.Task_ID) AS tc FROM ebdb.Tasks t;')
+            var pPage = await connection.query('SELECT p.Project_Image AS projectimage FROM ebdb.Project p;')
+
+            var obj = {
+                projects_count: pCount[0].pc,
+                tasks_count: tCount[0].tc,
+                projects: pPage
+            }
+
+            res.render('dashboard_manager', { obj: obj })
 
         }
 
@@ -167,24 +182,31 @@ app.get("/tasks", async function (req, res) {
     res.render('tasks', { obj: tmp[0] })
 })
 
+app.get('/logout', async (req, res) => {
+    res.clearCookie('userData')
+    res.redirect('/')
+})
 
 app.post('/', async function (req, res) {
     //console.log(req.body)
     var u = req.body.user
+    var pl
 
     var userQuery = await connection.query(`SELECT u.Username, u.Employee_ID, u.Client_ID, u.Manager FROM ebdb.Users u WHERE u.Username = '${u.user}' AND u.Password = '${u.password}';`)
 
-    var pl;
+    try {
+        userQuery[0].Employee_ID
+    } catch (e) {
+
+        res.redirect('/')
+    }
+
     if (userQuery[0].Employee_ID != null) {
+
         pl = {
             username: userQuery[0].Username,
             userType: 'E'
         }
-
-        console.log(pl)
-        const uToken = jwt.sign(pl, private_key)
-        res.cookie('userData', uToken)
-        res.redirect('/')
 
     }
     else if (userQuery[0].Client_ID != null) {
@@ -198,7 +220,12 @@ app.post('/', async function (req, res) {
             username: userQuery[0].User,
             userType: 'M'
         }
+
     }
+
+    const uToken = jwt.sign(pl, private_key)
+    res.cookie('userData', uToken)
+    res.redirect('/')
 
 })
 
