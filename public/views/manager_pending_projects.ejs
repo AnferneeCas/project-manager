@@ -28,7 +28,7 @@
                     <a href="#">Active projects</a>
                 </li>
                 <li>
-                    <a href="#">Pending projects</a>
+                    <a href="/pending-projects">Pending projects</a>
                 </li>
                 <li>
                     <a href="/logout">Logout</a>
@@ -56,55 +56,69 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalCenterTitle">Modal title</h5>
+          <h5 class="modal-title" id="exampleModalCenterTitle">Select the employees working on this project</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
-          ...
-        </div>
+
+        <%obj.employees.forEach(function(employee){ %>
+          <div class="form-check form-check-inline " style="margin: 1em; border: 2px solid black; padding: 0.5em; font-size: 20px;">
+            <input class="form-check-input team-checkbox" type="checkbox" id="inlineCheckbox1" value="<%=employee.id%>">
+            <label class="form-check-label" for="inlineCheckbox1"> <%=employee.name%></label>
+          </div>
+       <% }) %>
+       
+
+       
+
+       
+      
+        
+      
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-primary btn-change">Save changes</button>
         </div>
       </div>
     </div>
   </div>
             
+  <%obj.projects.forEach(function(project){ %>
+    <a href=""  class="card col-md-3 project-card"  style="text-decoration: none;color: black !important; max-width: 300px; margin-right: 5%; margin-top:2.5%; padding:0 !important; ">
+      <img src="<%=project.image%>" class="card-img-top" alt="...">
+      <div class="card-body">
+        <h2 class="card-title"><%=project.title%></h2>
+        <span><h5 class="card-text"><%=project.price%> $</h5> </span>
+        <span><h5 class="card-text">Due date: <%=project.duedate%></h5> </span>
+        
+
+        <button class="btn btn-info description-button">View Description</button>
+            
+        </div>
+      <div class="card-footer">
+        <div class="row ">
+            <div class="col-md-6">
+              <button   type="button" class="btn btn-success accept-button" data-toggle="modal" data-target="#exampleModalCenter">
+                  Accept
+              </button>                            
+            </div>
+
+            <div class="col-md-6" >
+              <button class="btn btn-danger">Reject</button>   
+                </div>
+
+
+              
            
+            
+        </div>
+      </div>
+    </a>
+  <% }) %>
 
 
-                    <a href=""  class="card col-md-3 project-card"  style="text-decoration: none;color: black !important; max-width: 300px; margin-right: 5%; margin-top:2.5%; padding:0 !important; ">
-                        <img src="" class="card-img-top" alt="...">
-                        <div class="card-body">
-                          <h2 class="card-title">Title</h2>
-                          <span><h5 class="card-text">Price: 15,2330 $</h5> </span>
-                          <span><h5 class="card-text">Due date: 12/24/32</h5> </span>
-                          
-
-                          <button class="btn btn-info">View Description</button>
-                              
-                          </div>
-                        <div class="card-footer">
-                          <div class="row ">
-                              <div class="col-md-6">
-                                <button  type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
-                                    Launch demo modal
-                                </button>                            
-                              </div>
-
-                              <div class="col-md-6" >
-                                <button class="btn btn-danger">Reject</button>   
-                                  </div>
-
-
-                                
-                             
-                              
-                          </div>
-                        </div>
-                      </a>
+            
                       
 
                       
@@ -124,6 +138,7 @@
     </div>
     <!-- /#wrapper -->
     <!-- <script src="../scripts/dashboard_manager_script.js"></script> -->
+    <script src="../scripts/manager_pending_projects_script.js"></script>
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
