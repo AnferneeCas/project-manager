@@ -15,18 +15,18 @@ const express = require('express'),
 
 const jwt = require('jsonwebtoken')
 
-//ALTER SESSION SET "_ORACLE_SCRIPT" = true;
+// ALTER SESSION SET "_ORACLE_SCRIPT" = true;
 
-//CREATE USER cuenta IDENTIFIED BY cuenta;
-//DEFAULT TABLESAPCE "USERS"
-//temporary tablesapce "TMP"
+// CREATE USER cuenta IDENTIFIED BY cuenta;
+// DEFAULT TABLESAPCE "USERS"
+// temporary tablesapce "TMP"
 
-//alter user cuenta quota unlimited on USERS
+// alter user cuenta quota unlimited on USERS
 
-//grant create table to cuenta;
-//grant create session to cuenta;
+// grant create table to cuenta;
+// grant create session to cuenta;
 
-//alter session set current_schema = cuenta;
+// alter session set current_schema = cuenta;
 
 //Configuration and declaration
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -74,7 +74,7 @@ app.get('/', async function (req, res) {
 
         if (userLogged.userType == 'E') {
 
-            var empID = await connection.query(`SELECT u.Employee_ID FROM ebdb.Users u WHERE u.Username = '${userLogged.username}'`);
+            var empID = await connection.query(`SELECT u.Employee_ID FROM ebdb.Users u WHERE u.Username = '${userLogged.username}'`)
             var pPage = await connection.query(`SELECT p.Project_Name AS title, p.Project_Description AS description, p.Project_Image AS projectimage, p.Project_ID AS projectid FROM ebdb.Project p INNER JOIN ebdb.Project_x_Employee pe ON p.Project_ID = pe.Project_ID WHERE pe.Employee_ID = '${empID[0].Employee_ID}';`)
             var pCount = await connection.query(`SELECT COUNT(p.Project_ID) AS pc FROM ebdb.Project p INNER JOIN ebdb.Project_x_Employee pe ON p.Project_ID = pe.Project_ID WHERE pe.Employee_ID = '${empID[0].Employee_ID}';`)
             var tCount = await connection.query(`SELECT COUNT(t.Task_ID) AS tc FROM ebdb.Tasks t INNER JOIN ebdb.Task_x_Employee te ON te.Task_ID = t.Task_ID WHERE te.Employee_ID = ${empID[0].Employee_ID};`)
@@ -205,20 +205,23 @@ app.post('/', async function (req, res) {
 
         pl = {
             username: userQuery[0].Username,
-            userType: 'E'
+            userType: 'E',
+            typeID: userQuery[0].Employee_ID
         }
 
     }
     else if (userQuery[0].Client_ID != null) {
         pl = {
             username: userQuery[0].User,
-            userType: 'C'
+            userType: 'C',
+            typeID: userQuery[0].Client_ID
         }
     }
     else if (userQuery[0].Manager != null) {
         pl = {
             username: userQuery[0].User,
-            userType: 'M'
+            userType: 'M',
+            typeID: userQuery[0].Manager
         }
 
     }
@@ -230,7 +233,7 @@ app.post('/', async function (req, res) {
 })
 
 
-app.get('/pending-projects',function (req,res) {
+app.get('/pending-projects', function (req, res) {
     res.render('manager_pending_projects');
 });
 
@@ -252,4 +255,6 @@ async function getTasks() {
     return result;
 }
 
+// async function isLogged(x) {
 
+// }
