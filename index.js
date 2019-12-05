@@ -64,12 +64,10 @@ app.get('/', async function (req, res) {
     //buscar obj en la base de datos, segun el id del user logged 
     //(el id del user logged debe guardarse en los cookies al momento de iniciar sesion)
 
-    // console.log(req.cookies.userData)
-    //console.log(jwt.decode(req.cookies.userData))
-    var c = req.cookies.userData
-    if (c === undefined)
-        res.render('login')
-    else {
+    var c = req.cookies.userData,
+        log = isLogged(c)
+
+    if (log) {
         var userLogged = jwt.decode(c)
 
         if (userLogged.userType == 'E') {
@@ -106,6 +104,8 @@ app.get('/', async function (req, res) {
         }
 
     }
+    else
+        res.render('login')
 
 })
 
@@ -226,7 +226,7 @@ app.post('/', async function (req, res) {
 
     }
 
-    const uToken = jwt.sign(pl, private_key)
+    const uToken = jwt.sign(pl, private_key, { expiresIn: '1h' })
     res.cookie('userData', uToken)
     res.redirect('/')
 
@@ -255,6 +255,9 @@ async function getTasks() {
     return result;
 }
 
-// async function isLogged(x) {
-
-// }
+function isLogged(x) {
+    if (x === undefined)
+        return false
+    else
+        return true
+}
