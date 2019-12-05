@@ -231,7 +231,26 @@ app.post('/', async function (req, res) {
 
 
 app.get('/pending-projects',function (req,res) {
-    res.render('manager_pending_projects');
+
+    var obj = {
+        employees:[{name:"Anfernee Castillo",id:"2312"},{name:"Arturo Rendon",id:"23123"}],
+        projects:[{
+            projectid:2312,
+            image:"https://images.unsplash.com/photo-1538370965046-79c0d6907d47?ixlib=rb-1.2.1&w=1000&q=80",
+            title:"GTA V",
+            price: 25000.23,
+            duedate:"12/32/23",
+            description:"This is an awesome game :)"
+        },{
+            projectid:102,
+            image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPcyw6YJJ3QQd9n-XmNWlikH1FThaImNq-ro2m_HKso2C6wfJe3A&s",
+            title:"Red dead redemtion 2",
+            price: 455000.23,
+            duedate:"12/32/23",
+            description:"This game is crazy men :)"
+        }]
+    }
+    res.render('manager_pending_projects',{obj:obj});
 });
 
 
