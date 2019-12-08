@@ -91,8 +91,7 @@ app.get('/', async function (req, res) {
 
             var pCount = await connection.query('SELECT COUNT(p.Project_ID) AS pc FROM ebdb.Project p;')
             var eCount = await connection.query('SELECT COUNT(t.Employee_ID) as ec FROM ebdb.Employees t;')
-            var pPage = await connection.query('SELECT p.Project_Image AS projectimage, p.Project_ID as projectid, p.Project_Name as title, p.Project_Description as description FROM ebdb.Project p;')
-
+            var pPage = await connection.query("SELECT p.Project_Image AS projectimage, p.Project_ID as projectid, p.Project_Name as title, p.Project_Description as description,count(t.Project_ID) as QtyTasks, count(tb.Bug_Name) as Bugs FROM ebdb.Project p left join ebdb.Tasks t on p.Project_ID = t.Project_ID left join ebdb.Task_x_Bug tb on t.Task_ID = tb.Task_ID WHERE p.IsApproved = 'Y' group by  p.Project_Image, p.Project_ID, p.Project_Name, p.Project_Description")
             var obj = {
                 projects_count: pCount[0].pc,
                 employees_count: eCount[0].ec,
@@ -168,6 +167,7 @@ app.get("/task-page/:taskid", function (req, res) {
 
 app.get("/tasks", async function (req, res) {
 
+    var aTasks = await connection.query('');
 
     // var obj = {
     //       projectid: Tasks[i].Project_ID,
@@ -233,27 +233,17 @@ app.post('/', async function (req, res) {
 })
 
 
-app.get('/pending-projects',function (req,res) {
+app.get('/pending-projects', async function (req, res) {
+
+    var aEmployees = await connection.query('SELECT e.Employee_Name AS name, e.Employee_ID AS id FROM ebdb.Employees e;')
+    var pProjects = await connection.query("SELECT p.Project_ID AS projectid, p.Project_Image AS image, p.Project_Name AS title, p.Deliver_Date AS duedate, p.Project_Description AS description, p.Order_Price AS price FROM ebdb.Project p WHERE p.IsApproved = 'N';")
 
     var obj = {
-        employees:[{name:"Anfernee Castillo",id:"2312"},{name:"Arturo Rendon",id:"23123"}],
-        projects:[{
-            projectid:2312,
-            image:"https://images.unsplash.com/photo-1538370965046-79c0d6907d47?ixlib=rb-1.2.1&w=1000&q=80",
-            title:"GTA V",
-            price: 25000.23,
-            duedate:"12/32/23",
-            description:"This is an awesome game :)"
-        },{
-            projectid:102,
-            image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPcyw6YJJ3QQd9n-XmNWlikH1FThaImNq-ro2m_HKso2C6wfJe3A&s",
-            title:"Red dead redemtion 2",
-            price: 455000.23,
-            duedate:"12/32/23",
-            description:"This game is crazy men :)"
-        }]
+        employees: aEmployees,
+        projects: pProjects
     }
-    res.render('manager_pending_projects',{obj:obj});
+
+    res.render('manager_pending_projects', { obj: obj });
 });
 
 
@@ -262,17 +252,6 @@ app.listen(3000)
 
 
 
-
-
-
-
-async function getTasks() {
-
-    var result = await connection.query('select t.Project_ID, t.Task_ID, t.Task_Name, p.Project_Name, t.Task_Instructions,t.Task_Requirements from Tasks t inner join Project p on p.Project_ID = t.Project_ID ;');
-
-    console.log(result);
-    return result;
-}
 
 function isLogged(x) {
     if (x === undefined)
