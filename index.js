@@ -1,6 +1,9 @@
+//Require
 const express = require('express'),
     app = express(),
     mysql = require('mysql'),
+    cookieParser = require('cookie-parser'),
+    bodyParser = require('body-parser'),
     connection = mysql.createConnection({
         host: 'anfer2325.cpqgjl5d66m6.us-east-2.rds.amazonaws.com',
         user: 'admin',
@@ -10,7 +13,38 @@ const express = require('express'),
     }),
     util = require('util')
 
-connection.connect(async (err) => {
+const jwt = require('jsonwebtoken')
+
+connection.query = util.promisify(connection.query);
+
+// CREATE USER cuenta IDENTIFIED BY cuenta;
+// DEFAULT TABLESAPCE "USERS"
+// temporary tablesapce "TMP"
+
+// alter user cuenta quota unlimited on USERS
+
+// grant create table to cuenta;
+// grant create session to cuenta;
+
+// alter session set current_schema = cuenta;
+
+//Configuration and declaration
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(cookieParser())
+const private_key = 'arturoyanfer'
+const payload = {
+    username: 'r2rendon',
+    userType: 'E'
+}
+
+const token = jwt.sign(payload, private_key, { expiresIn: '1d' })
+console.log(token)
+
+var v = jwt.verify(token, private_key)
+console.log(v)
+
+
+connection.connect((err) => {
     if (err)
         console.log(err)
     else
@@ -18,36 +52,6 @@ connection.connect(async (err) => {
 })
 
 connection.query = util.promisify(connection.query);
-
-
-
-
-
-
-// This is an insert template for the Project table
-// INSERT INTO ebdb.Project (Project_State, Project_DataBase, FrontEnd_Tech, BackEnd_Tech, 
-//     Project_Name, Start_Date, Deliver_Date, Order_ID, Order_Price, Client_ID)
-//     VALUES ('In Process', 'MySQL', 'HTML, Bootstrap', 'NodeJS, Express',
-//     'HECTOR PRESI', '26-11-19', '26-11-20', '1200', 20000.99, 
-//     (SELECT c.Client_ID FROM ebdb.Client c WHERE c.Client_Name = 'Arturo Rendon'));
-
-var Employees
-connection.query('SELECT * FROM ebdb.Employees;', (err, results, fields) => {
-    if (err) throw err
-    Employees = results
-})
-
-var Projects
-connection.query('SELECT * FROM ebdb.Project;', (err, results, fields) => {
-    if (err) throw err
-    Projects = results
-})
-
-var Tasks
-connection.query('SELECT * FROM ebdb.Tasks;', (err, results, fields) => {
-    if (err) throw err
-    Tasks = results
-})
 
 
 //ejs
@@ -104,7 +108,7 @@ app.get('/', async function (req, res) {
 
 })
 
-app.get('/project-page/:projectid', function (req, res) {
+app.get('/project-page/:projectid', async function (req, res) {
     //NOTA MOSTRAR PAGINA SIEMPRE Y CUANDO EXISTA UN USUARIO LOGGED y el usuarios sea miembre del proyecto
 
     //el id del user logged tiene que ser miembro del projecto que se este solicitando (projectid) 
@@ -113,21 +117,22 @@ app.get('/project-page/:projectid', function (req, res) {
 
     //object segun id
 
-    var members = [];
-    for (var i = 0; i < Employees.length; i++) {
-        members.push({
-            name: Employees[i].Employee_Name,
-            id: Employees[i].Employee_ID
-        })
-    }
+    var members = await connection.query('SELECT e.Employee_Name AS name, e.Employee_ID AS id FROM ebdb.Employees e INNER JOIN ebdb.Project_x_Employee pe ON pe.Employee_ID = e.Employee_ID INNER JOIN ebdb.Project p ON pe.Project_ID = p.Project_ID WHERE p.Project_ID = ' + req.params.projectid + ';')
+    var pImage = await connection.query('SELECT p.Project_Image AS image FROM ebdb.Project p WHERE p.Project_ID = ' + req.params.projectid + ';')
+    var pTitle = await connection.query('SELECT p.Project_Name AS title FROM ebdb.Project p WHERE p.Project_ID = ' + req.params.projectid + ';')
+    var tasksNumber = await connection.query('SELECT COUNT(t.Task_ID) AS number FROM ebdb.Tasks t INNER JOIN ebdb.Project p ON p.Project_ID = t.Project_ID WHERE p.Project_ID = ' + req.params.projectid + ';')
+    var tasksDone = await connection.query("SELECT COUNT(t.Task_ID) AS tDone FROM ebdb.Tasks t WHERE t.Task_Status = 'Done' AND t.Project_ID = " + req.params.projectid + ";")
+    var bugs = await connection.query('SELECT COUNT(b.Bug_Name) AS bNumber FROM ebdb.Bugs b INNER JOIN ebdb.Task_x_Bug tb ON tb.Bug_Name = b.Bug_Name INNER JOIN ebdb.Tasks t ON t.Task_ID = tb.Task_ID WHERE t.Project_ID = ' + req.params.projectid + ';')
+    var bugsFixed = await connection.query("SELECT COUNT(b.Bug_Name) AS unsolved FROM ebdb.Bugs b INNER JOIN ebdb.Task_x_Bug tb ON tb.Bug_Name = b.Bug_Name INNER JOIN ebdb.Tasks t on t.Task_ID = tb.Task_ID WHERE t.Task_ID = " + req.params.projectid + " AND b.Bug_Status = 'Solved';")
+    //var tHistory = await connection.query('');
 
     var obj = {
-        projectimage: "logo1.png",
-        projecttitle: "Titulo",
-        tasksnumber: 10,
-        tasksdone: 1,
-        bugsnumber: 5,
-        bugsfixed: 0,
+        projectimage: pImage[0].image,
+        projecttitle: pTitle[0].title,
+        tasksnumber: tasksNumber[0].number,
+        tasksdone: tasksDone[0].tDone,
+        bugsnumber: bugs[0].bNumber,
+        bugsfixed: bugsFixed[0].unsolved,
         progressbar: 0,
         taskbar: 0,
         bugbar: 0,
@@ -135,9 +140,13 @@ app.get('/project-page/:projectid', function (req, res) {
         taskhistory: [{ id: 1, owner: "Anfernee castillo", title: "Create login", status: "warning" }, { id: 1, owner: "Anfernee castillo", title: "Create login", status: "done" }]
     }
 
+    // var userQuery = await connection.query(`SELECT u.Username, u.Employee_ID, u.Client_ID, u.Manager FROM ebdb.Users u WHERE u.Username = '${'r2chinchilla'}' AND u.Password = '${'Hola'}';`)
+
+    // console.log(userQuery)
+
 
     //fix progress bar
-    obj.progressbar = 81 - (81 - (((obj.tasksnumber - obj.tasksdone) / 0.81 + (obj.bugsnumber - obj.bugsfixed) / 0.81)));
+    obj.progressbar = 81 - ((((obj.tasksnumber - obj.tasksdone) / 0.81) + ((obj.bugsnumber - obj.bugsfixed) / 0.81)));
     obj.taskbar = 91 - (91 - ((obj.tasksnumber - obj.tasksdone) / 0.91));
     obj.bugbar = 92 - (92 - ((obj.bugsnumber - obj.bugsfixed) / 0.92));
     res.render('project_page', { obj: obj });
@@ -160,10 +169,8 @@ app.get("/tasks", async function (req, res) {
 
     var tasks = await connection.query('SELECT t.Project_ID AS projectid, p.Project_Name AS projecttitle, t.Task_ID AS taskid, t.Task_Name AS taskttitle, t.Task_Instructions AS taskdescription, t.Task_Status AS currentstatus FROM ebdb.Tasks t INNER JOIN ebdb.Project p ON t.Project_ID = p.Project_ID')
 
-    // var TasksForTaskList = [];
-    // for (var i = 0; i < Tasks.length; i++) {
-    //     TasksForTaskList.push({
-    //         projectid: Tasks[i].Project_ID,
+    // var obj = {
+    //       projectid: Tasks[i].Project_ID,
     //         projecttitle: await getProjectNameByID(Tasks[i].Project_ID),
     //         taskid: Tasks[i].Task_ID,
     //         tasktitle: Tasks[i].Task_Name,
@@ -227,6 +234,8 @@ app.post('/', async function (req, res) {
 
 app.get('/pending-projects', async function (req, res) {
 
+    var aEmployees = await connection.query('SELECT e.Employee_Name AS name, e.Employee_ID AS id FROM ebdb.Employees e;')
+    var pProjects = await connection.query("SELECT p.Project_ID AS projectid, p.Project_Image AS image, p.Project_Name AS title, p.Deliver_Date AS duedate, p.Project_Description AS description, p.Order_Price AS price FROM ebdb.Project p WHERE p.IsApproved = 'N';")
 
     var allEmployees = await connection.query('SELECT e.Employee_Name AS name, e.Employee_ID AS id FROM ebdb.Employees e;')
     var allProjects = await connection.query("SELECT p.Project_ID AS projectid, p.Project_Image AS image, p.Project_Name AS title, p.Order_Price AS price, p.Deliver_Date AS duedate, p.Project_Description AS description FROM Project p WHERE p.IsApproved = 'N';")

@@ -1,0 +1,33 @@
+body {
+    background-color: #313D4C;
+}
+
+#login_form{
+    background-color: white;
+    position: absolute;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    width: 500px;
+    height: 500px;
+    /* max-width: 500px;
+    max-height: 500px; */
+    border: 1px solid green;
+    text-align: center;
+    padding: 2% 2%;
+}
+
+#logo{
+    margin: 5% auto;
+}
+
+input{
+    margin-top: 10%;
+}
+
+button{
+    margin-top: 10%;
+    
+}
