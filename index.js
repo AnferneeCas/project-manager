@@ -112,7 +112,7 @@ app.post('/register', async function (req, res) {
     //     idNUm: '0801melapela'
     // }
     connection.query(`INSERT INTO ebdb.Client (Client_Name, Client_Address, Client_IDNumber) VALUES ('${req.body.client.name}', '${req.body.client.address}', '${req.body.client.idNum}');`)
-    connection.query("INSERT INTO `ebdb`.`Users` (`Username`, `Password`, `Email`, `Client_ID`) VALUES ('" + req.body.client.user + "', '" + req.body.client.password + "', '" + req.body.client.email + "',(SELECT c.Client_ID FROM ebdb.Client c WHERE c.Client_Name = 'DELETE'));")
+    connection.query("INSERT INTO `ebdb`.`Users` (`Username`, `Password`, `Email`, `Client_ID`) VALUES ('" + req.body.client.user + "', '" + req.body.client.password + "', '" + req.body.client.email + "',(SELECT c.Client_ID FROM ebdb.Client c WHERE c.Client_Name = '" + req.body.client.name + "'));")
 
     res.redirect('/')
 })
@@ -254,7 +254,7 @@ app.get('/pending-projects', async function (req, res) {
 });
 
 
-app.listen(3577)
+app.listen(3000)
 
 
 function isLogged(x) {
