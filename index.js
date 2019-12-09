@@ -29,19 +29,10 @@ connection.query = util.promisify(connection.query);
 // alter session set current_schema = cuenta;
 
 //Configuration and declaration
+const private_key = 'arturoyanfer'
+
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cookieParser())
-const private_key = 'arturoyanfer'
-const payload = {
-    username: 'r2rendon',
-    userType: 'E'
-}
-
-const token = jwt.sign(payload, private_key, { expiresIn: '1d' })
-console.log(token)
-
-var v = jwt.verify(token, private_key)
-console.log(v)
 
 
 connection.connect((err) => {
@@ -108,6 +99,24 @@ app.get('/', async function (req, res) {
 
 })
 
+app.get('/register', async function (req, res) {
+    res.render('register_client')
+})
+
+app.post('/register', async function (req, res) {
+    // {
+    //     email: 'hola@unitec.edu',
+    //     user: 'hellow',
+    //     password: 'Password',
+    //     address: 'No se',
+    //     idNUm: '0801melapela'
+    // }
+    connection.query(`INSERT INTO ebdb.Client (Client_Name, Client_Address, Client_IDNumber) VALUES ('${req.body.client.name}', '${req.body.client.address}', '${req.body.client.idNum}');`)
+    connection.query("INSERT INTO `ebdb`.`Users` (`Username`, `Password`, `Email`, `Client_ID`) VALUES ('" + req.body.client.user + "', '" + req.body.client.password + "', '" + req.body.client.email + "',(SELECT c.Client_ID FROM ebdb.Client c WHERE c.Client_Name = 'DELETE'));")
+
+    res.redirect('/')
+})
+
 app.get('/project-page/:projectid', async function (req, res) {
     //NOTA MOSTRAR PAGINA SIEMPRE Y CUANDO EXISTA UN USUARIO LOGGED y el usuarios sea miembre del proyecto
 
@@ -124,7 +133,7 @@ app.get('/project-page/:projectid', async function (req, res) {
     var tasksDone = await connection.query("SELECT COUNT(t.Task_ID) AS tDone FROM ebdb.Tasks t WHERE t.Task_Status = 'Done' AND t.Project_ID = " + req.params.projectid + ";")
     var bugs = await connection.query('SELECT COUNT(b.Bug_Name) AS bNumber FROM ebdb.Bugs b INNER JOIN ebdb.Task_x_Bug tb ON tb.Bug_Name = b.Bug_Name INNER JOIN ebdb.Tasks t ON t.Task_ID = tb.Task_ID WHERE t.Project_ID = ' + req.params.projectid + ';')
     var bugsFixed = await connection.query("SELECT COUNT(b.Bug_Name) AS unsolved FROM ebdb.Bugs b INNER JOIN ebdb.Task_x_Bug tb ON tb.Bug_Name = b.Bug_Name INNER JOIN ebdb.Tasks t on t.Task_ID = tb.Task_ID WHERE t.Task_ID = " + req.params.projectid + " AND b.Bug_Status = 'Solved';")
-    //var tHistory = await connection.query('');
+    var tHistory = await connection.query(`SELECT t.Task_ID AS id, t.Task_Name AS title, t.Task_Status AS status FROM ebdb.Tasks t WHERE t.Project_ID = ${req.params.projectid}`)
 
     var obj = {
         projectimage: pImage[0].image,
@@ -137,7 +146,7 @@ app.get('/project-page/:projectid', async function (req, res) {
         taskbar: 0,
         bugbar: 0,
         teammembers: members,
-        taskhistory: [{ id: 1, owner: "Anfernee castillo", title: "Create login", status: "warning" }, { id: 1, owner: "Anfernee castillo", title: "Create login", status: "done" }]
+        taskhistory: tHistory
     }
 
     // var userQuery = await connection.query(`SELECT u.Username, u.Employee_ID, u.Client_ID, u.Manager FROM ebdb.Users u WHERE u.Username = '${'r2chinchilla'}' AND u.Password = '${'Hola'}';`)
@@ -233,9 +242,6 @@ app.post('/', async function (req, res) {
 
 
 app.get('/pending-projects', async function (req, res) {
-
-    var aEmployees = await connection.query('SELECT e.Employee_Name AS name, e.Employee_ID AS id FROM ebdb.Employees e;')
-    var pProjects = await connection.query("SELECT p.Project_ID AS projectid, p.Project_Image AS image, p.Project_Name AS title, p.Deliver_Date AS duedate, p.Project_Description AS description, p.Order_Price AS price FROM ebdb.Project p WHERE p.IsApproved = 'N';")
 
     var allEmployees = await connection.query('SELECT e.Employee_Name AS name, e.Employee_ID AS id FROM ebdb.Employees e;')
     var allProjects = await connection.query("SELECT p.Project_ID AS projectid, p.Project_Image AS image, p.Project_Name AS title, p.Order_Price AS price, p.Deliver_Date AS duedate, p.Project_Description AS description FROM Project p WHERE p.IsApproved = 'N';")
