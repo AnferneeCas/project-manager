@@ -1,0 +1,34 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="/stylesheets/login.css">
+    <title>Log-In</title>
+</head>
+
+<body>
+    <div class="content">
+        <div id="login_form">
+            <h3 id='logo'>REGISTER</h3>
+
+            <form action="/register" method="POST">
+                <input type="text" class="form-control" placeholder="Name and Last name" name="client[name]" id="name">
+                <input type="text" class="form-control" placeholder="Email" name="client[email]" id="email">
+                <input type="text" class="form-control" placeholder="Username" id="username" name="client[user]">
+                <input type="text" class="form-control" placeholder="Password" id="password" name="client[password]">
+                <input type="text" class="form-control" placeholder="Address" id="address" name="client[address]">
+                <input type="text" class="form-control" placeholder="National ID Number" id="idNumber"
+                    name="client[idNUm]">
+                <button type="submit" class="btn btn-lg btn-outline-success" id="submit_button">Register!</button>
+            </form>
+        </div>
+    </div>
+
+
+</body>
+
+</html>

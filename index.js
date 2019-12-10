@@ -100,7 +100,7 @@ app.get('/', async function (req, res) {
 
             res.render('dashboard_manager', { obj: obj })
 
-        }
+        } 
 
     }
     else
@@ -205,6 +205,10 @@ app.get('/logout', async (req, res) => {
     res.redirect('/')
 })
 
+app.get('/employees',async(req,res)=>{
+    res.render('employees_page');
+})
+
 app.post('/', async function (req, res) {
     //console.log(req.body)
     var u = req.body.user
@@ -263,6 +267,29 @@ app.get('/pending-projects', async function (req, res) {
 
     res.render('manager_pending_projects', { obj: obj });
 });
+
+
+app.get('/register', async function (req, res) {
+    res.render('register_client')
+})
+
+app.post('/register', async function (req, res) {
+    // {
+    //     email: 'hola@unitec.edu',
+    //     user: 'hellow',
+    //     password: 'Password',
+    //     address: 'No se',
+    //     idNUm: '0801melapela'
+    // }
+    connection.query(`INSERT INTO ebdb.Client (Client_Name, Client_Address, Client_IDNumber) VALUES ('${req.body.client.name}', '${req.body.client.address}', '${req.body.client.idNum}');`)
+    connection.query("INSERT INTO `ebdb`.`Users` (`Username`, `Password`, `Email`, `Client_ID`) VALUES ('" + req.body.client.user + "', '" + req.body.client.password + "', '" + req.body.client.email + "',(SELECT c.Client_ID FROM ebdb.Client c WHERE c.Client_Name = '" + req.body.client.name + "'));")
+
+    res.redirect('/')
+})
+
+
+
+
 
 
 app.listen(3000)
