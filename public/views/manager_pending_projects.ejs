@@ -90,6 +90,44 @@
             </div>
           </div>
 
+
+
+
+          <!-- Modal -->
+          <div class="modal fade" id="exampleModalCenterReject" tabindex="-1" role="dialog"
+            aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalCenterTitle">Why are you rejecting the project?</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+
+                <form action="">
+                    
+                  <div class="form-group">
+                    <label for="exampleFormControlTextarea1">Description</label>
+                    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                  </div>
+                </form>
+
+
+
+
+
+
+
+
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary btn-change">Reject</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <%obj.projects.forEach(function(project){ %>
           <a href="" class="card col-md-3 project-card"
             style="text-decoration: none;color: black !important; max-width: 300px; margin-right: 5%; margin-top:2.5%; padding:0 !important; ">
@@ -117,7 +155,7 @@
                 </div>
 
                 <div class="col-md-6">
-                  <button class="btn btn-danger">Reject</button>
+                  <button class="btn btn-danger accept-button" data-toggle="modal" data-target="#exampleModalCenterReject">Reject</button>
                 </div>
 
 

@@ -177,7 +177,7 @@
                                             </thead>
                                             <tbody>
                                                 <% obj.taskhistory.forEach(function(task){ %>
-                                                    <tr onclick="document.location ='/task-page/<%=task.id%>'">
+                                                    <tr >
                                                     <th scope="row"><%= task.id%></th>
                                                     <td><%= task.owner%></td>
                                                     <td><%= task.title%></td>
@@ -186,9 +186,13 @@
                                                             <span class="badge badge-warning">Warning</span>
                                                         <%}%>
                                                     </td> 
-                                                    <%if(obj.userType=='M'){%>
-                                                        <td> <button class="btn  btn-sm btn-danger">Delete</button></td>
-                                                    <%}%>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-info" onclick="document.location ='/task-page/<%=task.id%>'">View</button>
+                                                        <%if(obj.userType=='M'){%>
+                                                            <button class="btn  btn-sm btn-danger" type="submit">Delete</button>
+                                                        <%}%>
+                                                    </td>
+                                                    
 
                                                 <%})%>
                                              
