@@ -117,6 +117,15 @@ app.get('/project-page/:projectid', async function (req, res) {
 
     //object segun id
 
+    var c = req.cookies.userData,
+    log = isLogged(c)
+
+    if (log) {
+    var userLogged = jwt.decode(c)
+
+    
+        
+  
     var members = await connection.query('SELECT e.Employee_Name AS name, e.Employee_ID AS id FROM ebdb.Employees e INNER JOIN ebdb.Project_x_Employee pe ON pe.Employee_ID = e.Employee_ID INNER JOIN ebdb.Project p ON pe.Project_ID = p.Project_ID WHERE p.Project_ID = ' + req.params.projectid + ';')
     var pImage = await connection.query('SELECT p.Project_Image AS image FROM ebdb.Project p WHERE p.Project_ID = ' + req.params.projectid + ';')
     var pTitle = await connection.query('SELECT p.Project_Name AS title FROM ebdb.Project p WHERE p.Project_ID = ' + req.params.projectid + ';')
@@ -137,7 +146,9 @@ app.get('/project-page/:projectid', async function (req, res) {
         taskbar: 0,
         bugbar: 0,
         teammembers: members,
+        userType: userLogged.userType,
         taskhistory: [{ id: 1, owner: "Anfernee castillo", title: "Create login", status: "warning" }, { id: 1, owner: "Anfernee castillo", title: "Create login", status: "done" }]
+  
     }
 
     // var userQuery = await connection.query(`SELECT u.Username, u.Employee_ID, u.Client_ID, u.Manager FROM ebdb.Users u WHERE u.Username = '${'r2chinchilla'}' AND u.Password = '${'Hola'}';`)
@@ -149,7 +160,14 @@ app.get('/project-page/:projectid', async function (req, res) {
     obj.progressbar = 81 - ((((obj.tasksnumber - obj.tasksdone) / 0.81) + ((obj.bugsnumber - obj.bugsfixed) / 0.81)));
     obj.taskbar = 91 - (91 - ((obj.tasksnumber - obj.tasksdone) / 0.91));
     obj.bugbar = 92 - (92 - ((obj.bugsnumber - obj.bugsfixed) / 0.92));
+    
     res.render('project_page', { obj: obj });
+
+    
+
+    }else{
+        res.redirect('/');
+    }
 
 })
 

@@ -44,7 +44,7 @@
                             <div class="row">
                                     <div class="col-md-3    ">
                                             <span class="card" style="width: 18rem;">
-                                                    <img src="../images/<%=obj.projectimage%>" class="card-img-top" alt="...">
+                                                    <img src="<%=obj.projectimage%>" class="card-img-top" alt="...">
                                                     <span class="card-body ">
                                                       <h5 class="card-title" style="text-align: center;"><%=obj.projecttitle%></h5>
                                                       
@@ -100,7 +100,68 @@
                         </div>
                     </div>
     
-    
+
+<%if(obj.userType =='E' || obj.userType == 'M'){%>
+          <!-- Modal -->
+          <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+          aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">ADD NEW TASK</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+
+
+
+
+              <div>
+                <form>
+                    <div class="form-group">
+                      <label for="exampleFormControlInput1">Title</label>
+                      <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="DO SOMETHING">
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleFormControlSelect1">Select the owner</label>
+                      <select class="form-control" id="exampleFormControlSelect1">
+                        <% obj.teammembers.forEach(function(member){ %>
+                            <option value="<%=member.id%>"><%=member.name%></option>
+
+                         <%})%>
+                      </select>
+                    </div>
+                   
+                    <div class="form-group">
+                      <label for="exampleFormControlTextarea1">Description</label>
+                      <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                    </div>
+                  </form>
+              </div>
+
+
+
+
+
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary btn-change">Add</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+        <button type="button" class="btn btn-success accept-button" data-toggle="modal"
+        data-target="#exampleModalCenter">
+        Add task
+      </button>
+
+    <%} %>
+
+
                         <div class="row"style="margin-top: 10%;" >
                             <div class="container-fluid">
                                     <table class="table table-hover table-dark">
@@ -110,6 +171,7 @@
                                                 <th scope="col" style="text-align: center;">Owner</th>
                                                 <th scope="col" style="text-align: center;">Title</th>
                                                 <th scope="col" style="text-align: center;">Status</th>
+                                                <th scope="col" style="text-align: center;">Options</th>
                                               </tr>
                                             </thead>
                                             <tbody>
@@ -123,6 +185,10 @@
                                                             <span class="badge badge-warning">Warning</span>
                                                         <%}%>
                                                     </td> 
+                                                    <%if(obj.userType=='M'){%>
+                                                        <td> <button class="btn  btn-sm btn-danger">Delete</button></td>
+                                                    <%}%>
+
                                                 <%})%>
                                              
                                             </tbody>
@@ -135,5 +201,14 @@
 
     </div>
     <!-- /#wrapper -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
 </body>
 </html>
