@@ -27,7 +27,7 @@
         <li>
           <a href="/">My projects</a>
         </li>
-       
+
         <li>
           <a href="/account-settings">Account</a>
         </li>
@@ -42,66 +42,64 @@
     <!-- Page Content -->
     <div id="page-content-wrapper">
       <div class="container-fluid">
-          
+
         <div class="row">
 
 
-                <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
-                aria-labelledby="exampleModalCenterTitle" aria-hidden="true" >
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="exampleModalCenterTitle">Request Project</h5>
-                     
-                    </div>
-      
-      
-      
-      
-                    <div class="modal-body">
-                      <form>
-                          <div class="form-group">
-                            <label for="exampleFormControlInput1">Title</label>
-                            <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="The project 3000">
-                          </div>
-                          <div class="form-group">
-                            <label for="exampleFormControlSelect1">Price willing to pay: </label>
-                            <input type="number" class="form-control" name="" id="" placeholder="4000">
-                          </div>
-                         
-                          <div class="form-group">
-                            <label for="exampleFormControlTextarea1">Due date</label>
-                            <input type="date" name="" id="">
-                           
-                          </div>
+          <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+            aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalCenterTitle">Request Project</h5>
 
-                          <div class="form-group">
-                                <label for="exampleFormControlSelect1">Image url </label>
-                                <input type="text" class="form-control" name="" id="" placeholder="">
-                              </div>
+                </div>
 
-                          <div class="form-group">
-                            <label for=""> Description</label>
-                            <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
-                          </div>
-                        </form>
+
+
+
+                <div class="modal-body">
+                  <form method="POST" action="/newProject">
+                    <div class="form-group">
+                      <label for="exampleFormControlInput1">Title</label>
+                      <input type="text" class="form-control" id="exampleFormControlInput1"
+                        placeholder="The project 3000" name="p[name]">
                     </div>
-      
-      
-      
-      
-      
+                    <div class="form-group">
+                      <label for="exampleFormControlSelect1">Price willing to pay: </label>
+                      <input type="text" class="form-control" id="" placeholder="4000" name="p[price]">
+                    </div>
+
+                    <div class="form-group">
+                      <label for="exampleFormControlTextarea1">Due date</label>
+                      <input type="date" name="p[dDate]" id="">
+
+                    </div>
+
+                    <div class="form-group">
+                      <label for="exampleFormControlSelect1">Image url </label>
+                      <input type="text" class="form-control" name="p[image]" id="" placeholder="">
+                    </div>
+
+                    <div class="form-group">
+                      <label for=""> Description</label>
+                      <textarea name="p[description]" class="form-control" id="exampleFormControlTextarea1"
+                        rows="3"></textarea>
+                    </div>
+
                     <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                      <button type="button" class="btn btn-primary btn-change" >Request</button>
+                      <button type="submit" class="btn btn-primary btn-change">Request</button>
                     </div>
-                  </div>
+
+                  </form>
                 </div>
               </div>
-         
-            <button class="btn btn-success" data-toggle="modal"
-            data-target="#exampleModalCenter">Request Project</button>
-         
+            </div>
+          </div>
+
+          <button class="btn btn-success" data-toggle="modal" data-target="#exampleModalCenter">Request Project</button>
+
         </div>
 
 
@@ -122,17 +120,7 @@
             </div>
             <div class="card-footer">
               <div class="row justify-content-center">
-                <div class="col-md-4" style=" border: 2px black solid;">
 
-                  <span> <img src="../images/tasks_icon.png" style=" max-width:40px; " alt=""></span>
-                  <span style="padding-left:0.7em ;"><%= project.QtyTasks %></span>
-                </div>
-
-                <div class="col-md-4" style=" border: 2px black solid;">
-
-                  <span> <img src="../images/error_icon.png" style=" max-width:40px; " alt=""></span>
-                  <span style="padding-left:0.7em ;"><%= project.Bugs %></span>
-                </div>
 
 
 

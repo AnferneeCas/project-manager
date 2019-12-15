@@ -100,23 +100,72 @@ app.get('/', async function (req, res) {
 
             res.render('dashboard_manager', { obj: obj })
 
-        } 
-        else if(userLogged.userType == 'C'){
-            var obj={
-                projects: [{projectimage:"rul",projectid:101,title:"title",description: "this is a description",QtyTasks:1,Bugs:1}]
-            }
-            res.render('dashboard_client',{obj:obj});
         }
+        else if (userLogged.userType == 'C') {
 
+            var clientProjects = await connection.query(`SELECT p.Project_Image AS projectimage, p.Project_Name AS title, p.Project_ID AS projectid, p.Project_Description AS description FROM ebdb.Project p 
+            INNER JOIN ebdb.Client c ON p.Client_ID = c.Client_ID  WHERE p.Client_ID = ${userLogged.typeID};`)
+
+            var obj = {
+                projects: clientProjects
+            }
+
+            res.render('dashboard_client', { obj: obj });
+
+        }
     }
     else
         res.render('login')
 
 })
 
+app.post('/newProject', async function (req, res) {
 
-app.get('/account-settings', async function (req,res) {
-    res.render('account_settings');
+    var client = jwt.decode(req.cookies.userData)
+
+    console.log(req.body.p.price)
+
+    parseFloat(req.body.p.price)
+
+    var q = await connection.query(`INSERT INTO ebdb.Project(Project_Name, Due_Date, Order_ID, Order_Price, Client_ID, Project_Description, Project_Image, IsApproved)
+    VALUES ('${req.body.p.name}', '${req.body.p.dDate}', 1203, ${req.body.p.price}, ${client.typeID}, '${req.body.p.description}', '${req.body.p.image}','N')`)
+
+    res.redirect('/')
+
+})
+
+app.get('/account-settings', async function (req, res) {
+
+    var client = jwt.decode(req.cookies.userData)
+
+    var cInfo = await connection.query(`SELECT c.Client_Name AS name, u.Email AS email, u.Username AS username, u.Password AS password, c.Client_Address AS address, c.Client_IDNumber AS nID FROM ebdb.Client c INNER JOIN ebdb.Users u ON u.Client_ID = c.Client_ID WHERE c.Client_ID = ${client.typeID}`)
+
+    var obj = {
+        name: cInfo[0].name,
+        email: cInfo[0].email,
+        username: cInfo[0].username,
+        pass: cInfo[0].password,
+        address: cInfo[0].address,
+        nID: cInfo[0].nID
+    }
+
+    res.render('account_settings', { obj: obj });
+})
+
+app.post('/account-settings', async function (req, res) {
+
+    var u = jwt.decode(req.cookies.userData)
+
+    var updateC = await connection.query(`UPDATE ebdb.Client
+    SET Client_Name = '${req.body.acc.name}', Client_Address = '${req.body.acc.address}',Client_IDNumber = '${req.body.acc.nID}'
+    WHERE Client_ID = ${u.typeID};`)
+
+    var updateU = await connection.query(`UPDATE Users
+    SET Username = '${req.body.acc.username}', Password = '${req.body.acc.pass}', Email = '${req.body.acc.email}'
+    WHERE Client_ID = ${u.typeID};`)
+
+    res.redirect('/account-settings')
+
 })
 
 app.get('/project-page/:projectid', async function (req, res) {
@@ -129,54 +178,54 @@ app.get('/project-page/:projectid', async function (req, res) {
     //object segun id
 
     var c = req.cookies.userData,
-    log = isLogged(c)
+        log = isLogged(c)
 
     if (log) {
-    var userLogged = jwt.decode(c)
-
-    
-        
-  
-    var members = await connection.query('SELECT e.Employee_Name AS name, e.Employee_ID AS id FROM ebdb.Employees e INNER JOIN ebdb.Project_x_Employee pe ON pe.Employee_ID = e.Employee_ID INNER JOIN ebdb.Project p ON pe.Project_ID = p.Project_ID WHERE p.Project_ID = ' + req.params.projectid + ';')
-    var pImage = await connection.query('SELECT p.Project_Image AS image FROM ebdb.Project p WHERE p.Project_ID = ' + req.params.projectid + ';')
-    var pTitle = await connection.query('SELECT p.Project_Name AS title FROM ebdb.Project p WHERE p.Project_ID = ' + req.params.projectid + ';')
-    var tasksNumber = await connection.query('SELECT COUNT(t.Task_ID) AS number FROM ebdb.Tasks t INNER JOIN ebdb.Project p ON p.Project_ID = t.Project_ID WHERE p.Project_ID = ' + req.params.projectid + ';')
-    var tasksDone = await connection.query("SELECT COUNT(t.Task_ID) AS tDone FROM ebdb.Tasks t WHERE t.Task_Status = 'Done' AND t.Project_ID = " + req.params.projectid + ";")
-    var bugs = await connection.query('SELECT COUNT(b.Bug_Name) AS bNumber FROM ebdb.Bugs b INNER JOIN ebdb.Task_x_Bug tb ON tb.Bug_Name = b.Bug_Name INNER JOIN ebdb.Tasks t ON t.Task_ID = tb.Task_ID WHERE t.Project_ID = ' + req.params.projectid + ';')
-    var bugsFixed = await connection.query("SELECT COUNT(b.Bug_Name) AS unsolved FROM ebdb.Bugs b INNER JOIN ebdb.Task_x_Bug tb ON tb.Bug_Name = b.Bug_Name INNER JOIN ebdb.Tasks t on t.Task_ID = tb.Task_ID WHERE t.Task_ID = " + req.params.projectid + " AND b.Bug_Status = 'Solved';")
-    //var tHistory = await connection.query('');
-
-    var obj = {
-        projectimage: pImage[0].image,
-        projecttitle: pTitle[0].title,
-        tasksnumber: tasksNumber[0].number,
-        tasksdone: tasksDone[0].tDone,
-        bugsnumber: bugs[0].bNumber,
-        bugsfixed: bugsFixed[0].unsolved,
-        progressbar: 0,
-        taskbar: 0,
-        bugbar: 0,
-        teammembers: members,
-        userType: userLogged.userType,
-        taskhistory: [{ id: 1, owner: "Anfernee castillo", title: "Create login", status: "warning" }, { id: 1, owner: "Anfernee castillo", title: "Create login", status: "done" }]
-  
-    }
-
-    // var userQuery = await connection.query(`SELECT u.Username, u.Employee_ID, u.Client_ID, u.Manager FROM ebdb.Users u WHERE u.Username = '${'r2chinchilla'}' AND u.Password = '${'Hola'}';`)
-
-    // console.log(userQuery)
+        var userLogged = jwt.decode(c)
 
 
-    //fix progress bar
-    obj.progressbar = 81 - ((((obj.tasksnumber - obj.tasksdone) / 0.81) + ((obj.bugsnumber - obj.bugsfixed) / 0.81)));
-    obj.taskbar = 91 - (91 - ((obj.tasksnumber - obj.tasksdone) / 0.91));
-    obj.bugbar = 92 - (92 - ((obj.bugsnumber - obj.bugsfixed) / 0.92));
-    
-    res.render('project_page', { obj: obj });
 
-    
 
-    }else{
+        var members = await connection.query('SELECT e.Employee_Name AS name, e.Employee_ID AS id FROM ebdb.Employees e INNER JOIN ebdb.Project_x_Employee pe ON pe.Employee_ID = e.Employee_ID INNER JOIN ebdb.Project p ON pe.Project_ID = p.Project_ID WHERE p.Project_ID = ' + req.params.projectid + ';')
+        var pImage = await connection.query('SELECT p.Project_Image AS image FROM ebdb.Project p WHERE p.Project_ID = ' + req.params.projectid + ';')
+        var pTitle = await connection.query('SELECT p.Project_Name AS title FROM ebdb.Project p WHERE p.Project_ID = ' + req.params.projectid + ';')
+        var tasksNumber = await connection.query('SELECT COUNT(t.Task_ID) AS number FROM ebdb.Tasks t INNER JOIN ebdb.Project p ON p.Project_ID = t.Project_ID WHERE p.Project_ID = ' + req.params.projectid + ';')
+        var tasksDone = await connection.query("SELECT COUNT(t.Task_ID) AS tDone FROM ebdb.Tasks t WHERE t.Task_Status = 'Done' AND t.Project_ID = " + req.params.projectid + ";")
+        var bugs = await connection.query('SELECT COUNT(b.Bug_Name) AS bNumber FROM ebdb.Bugs b INNER JOIN ebdb.Task_x_Bug tb ON tb.Bug_Name = b.Bug_Name INNER JOIN ebdb.Tasks t ON t.Task_ID = tb.Task_ID WHERE t.Project_ID = ' + req.params.projectid + ';')
+        var bugsFixed = await connection.query("SELECT COUNT(b.Bug_Name) AS unsolved FROM ebdb.Bugs b INNER JOIN ebdb.Task_x_Bug tb ON tb.Bug_Name = b.Bug_Name INNER JOIN ebdb.Tasks t on t.Task_ID = tb.Task_ID WHERE t.Task_ID = " + req.params.projectid + " AND b.Bug_Status = 'Solved';")
+        //var tHistory = await connection.query('');
+
+        var obj = {
+            projectimage: pImage[0].image,
+            projecttitle: pTitle[0].title,
+            tasksnumber: tasksNumber[0].number,
+            tasksdone: tasksDone[0].tDone,
+            bugsnumber: bugs[0].bNumber,
+            bugsfixed: bugsFixed[0].unsolved,
+            progressbar: 0,
+            taskbar: 0,
+            bugbar: 0,
+            teammembers: members,
+            userType: userLogged.userType,
+            taskhistory: [{ id: 1, owner: "Anfernee castillo", title: "Create login", status: "warning" }, { id: 1, owner: "Anfernee castillo", title: "Create login", status: "done" }]
+
+        }
+
+        // var userQuery = await connection.query(`SELECT u.Username, u.Employee_ID, u.Client_ID, u.Manager FROM ebdb.Users u WHERE u.Username = '${'r2chinchilla'}' AND u.Password = '${'Hola'}';`)
+
+        // console.log(userQuery)
+
+
+        //fix progress bar
+        obj.progressbar = 81 - ((((obj.tasksnumber - obj.tasksdone) / 0.81) + ((obj.bugsnumber - obj.bugsfixed) / 0.81)));
+        obj.taskbar = 91 - (91 - ((obj.tasksnumber - obj.tasksdone) / 0.91));
+        obj.bugbar = 92 - (92 - ((obj.bugsnumber - obj.bugsfixed) / 0.92));
+
+        res.render('project_page', { obj: obj });
+
+
+
+    } else {
         res.redirect('/');
     }
 
@@ -216,7 +265,7 @@ app.get('/logout', async (req, res) => {
     res.redirect('/')
 })
 
-app.get('/employees',async(req,res)=>{
+app.get('/employees', async (req, res) => {
     res.render('employees_page');
 })
 
@@ -315,3 +364,18 @@ function isLogged(x) {
     else
         return true
 }
+
+
+
+
+{/* <div class="col-md-4" style=" border: 2px black solid;">
+
+<span> <img src="../images/tasks_icon.png" style=" max-width:40px; " alt=""></span>
+<span style="padding-left:0.7em ;"><%= project.QtyTasks %></span>
+</div>
+
+<div class="col-md-4" style=" border: 2px black solid;">
+
+<span> <img src="../images/error_icon.png" style=" max-width:40px; " alt=""></span>
+<span style="padding-left:0.7em ;"><%= project.Bugs %></span>
+</div> */}

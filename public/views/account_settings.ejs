@@ -27,7 +27,7 @@
         <li>
           <a href="/">My projects</a>
         </li>
-       
+
         <li>
           <a href="/account-settings">Account</a>
         </li>
@@ -42,63 +42,70 @@
     <!-- Page Content -->
     <div id="page-content-wrapper">
       <div class="container-fluid">
-      
 
-       <div class="modalss " id="exampleModalLong"  aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-            <div class="modal-dialog" \>
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLongTitle">Edit profile</h5>
-                  
-                </div>
-                <div class="modal-body">
-                  <form>
-                    
-                    <div class="form-group">
-                      <label for="exampleFormControlInput1">Name </label>
-                      <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="">
-                    </div>
-                    <div class="form-group">
-                      <label for="exampleFormControlSelect1">Email</label>
-                      <input type="text" class="form-control">
-                    </div>
-                    
-                    <div class="form-group">
-                      <label for="exampleFormControlInput1">Username</label>
-                      <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="">
-                          
-                    </div>
-  
-                    <div class="form-group">
-                      <label for="exampleFormControlInput1">Password</label>
-                      <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="">
-                          
-                    </div>
 
-                    <div class="form-group">
-                      <label for="exampleFormControlInput1">Address</label>
-                      <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="">
-                          
-                    </div>
+        <div class="modalss " id="exampleModalLong" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+          <div class="modal-dialog" \>
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Edit profile</h5>
 
-                    <div class="form-group">
-                      <label for="exampleFormControlInput1">National ID</label>
-                      <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="">
-                          
-                    </div>
-                  </form>
-                </div>
-                <div class="modal-footer">
-              
-                  <button type="button" class="btn btn-Primary" data-dismiss="modal">Save</button>
-                  
-                </div>
+              </div>
+              <div class="modal-body">
+                <form method="POST" action="/account-settings">
+
+                  <div class="form-group">
+                    <label for="exampleFormControlInput1">Name </label>
+                    <input value="<%= obj.name %>" type="text" class="form-control" id="exampleFormControlInput1"
+                      name="acc[name]">
+                  </div>
+                  <div class="form-group">
+                    <label for="exampleFormControlSelect1">Email</label>
+                    <input value="<%= obj.email %>" type="text" class="form-control" name="acc[email]">
+                  </div>
+
+                  <div class="form-group">
+                    <label for="exampleFormControlInput1">Username</label>
+                    <input value="<%= obj.username %>" type="text" class="form-control" id="exampleFormControlInput1"
+                      name="acc[username]">
+
+                  </div>
+
+                  <div class="form-group">
+                    <label for="exampleFormControlInput1">Password</label>
+                    <input value="<%= obj.pass %>" type="text" class="form-control" id="exampleFormControlInput1"
+                      name="acc[pass]">
+
+                  </div>
+
+                  <div class="form-group">
+                    <label for="exampleFormControlInput1">Address</label>
+                    <input value="<%= obj.address %>" type="text" class="form-control" id="exampleFormControlInput1"
+                      name="acc[address]">
+
+                  </div>
+
+                  <div class="form-group">
+                    <label for="exampleFormControlInput1">National ID</label>
+                    <input value="<%= obj.nID %>" type="text" class="form-control" id="exampleFormControlInput1"
+                      name="acc[nID]">
+
+                  </div>
+
+                  <div class="modal-footer">
+
+                    <button type="submit" class="btn btn-Primary" data-dismiss="modal">Save</button>
+
+                  </div>
+
+                </form>
               </div>
             </div>
           </div>
+        </div>
 
         <!-- BODY CONTENT -->
-      
+
 
         <!-- END BODY CONTENT -->
 
@@ -128,7 +135,3 @@
 </body>
 
 </html>
-       
-       
-       
-       
