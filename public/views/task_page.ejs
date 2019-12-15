@@ -24,7 +24,7 @@
                 <li>
                     <a href="/">Dashboard</a>
                 </li>
-                <% if(obj.userType='M'){%>
+                <% if(obj.userType=='M'){%>
                   <li>
                       <a href="/employees">Employess</a>
                   </li>
@@ -32,7 +32,7 @@
                   <li>
                       <a href="/pending-projects">Pending projects</a>
                   </li>
-                      <%} else {%>
+                      <%} else if(obj.userType=='E'){%>
                           <li>
                                   <a href="#">Projects</a>
                               </li>

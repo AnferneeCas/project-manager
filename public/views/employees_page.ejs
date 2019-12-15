@@ -50,7 +50,7 @@
         <!-- BODY CONTENT -->
         <div class="row"style="margin-top: 5%;" >
                 <div class="container-fluid">
-                    <button class="btn btn-success" style="margin-bottom: 1em;">Add an employee</button>
+                    <button class="btn btn-success" style="margin-bottom: 1em;" data-toggle="modal" data-target="#exampleModalLong">Add an employee</button>
                         <table class="table table-hover table-dark">
                                 <thead>
                                   <tr>
@@ -77,6 +77,58 @@
             </div>
 
         <!-- END BODY CONTENT -->
+
+
+        <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Register an employee</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <form>
+                  
+                  <div class="form-group">
+                    <label for="exampleFormControlInput1">Employee name </label>
+                    <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="">
+                  </div>
+                  <div class="form-group">
+                    <label for="exampleFormControlSelect1">Position</label>
+                    <select class="form-control" id="exampleFormControlSelect1">
+                      <option>Front-end</option>
+                      <option>Back-end</option>
+                      <option>Full-stack</option>
+                    </select>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="exampleFormControlInput1">Email</label>
+                    <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="">
+                        
+                  </div>
+
+                  <div class="form-group">
+                    <label for="exampleFormControlInput1">Password</label>
+                    <input type="password" class="form-control" id="exampleFormControlInput1" placeholder="">
+                        
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-Primary" data-dismiss="modal">Create</button>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+
 
       </div>
 

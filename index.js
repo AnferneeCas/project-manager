@@ -101,11 +101,22 @@ app.get('/', async function (req, res) {
             res.render('dashboard_manager', { obj: obj })
 
         } 
+        else if(userLogged.userType == 'C'){
+            var obj={
+                projects: [{projectimage:"rul",projectid:101,title:"title",description: "this is a description",QtyTasks:1,Bugs:1}]
+            }
+            res.render('dashboard_client',{obj:obj});
+        }
 
     }
     else
         res.render('login')
 
+})
+
+
+app.get('/account-settings', async function (req,res) {
+    res.render('account_settings');
 })
 
 app.get('/project-page/:projectid', async function (req, res) {
