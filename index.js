@@ -127,8 +127,8 @@ app.post('/newProject', async function (req, res) {
 
     parseFloat(req.body.p.price)
 
-    var q = await connection.query(`INSERT INTO ebdb.Project(Project_Name, Due_Date, Order_ID, Order_Price, Client_ID, Project_Description, Project_Image, IsApproved)
-    VALUES ('${req.body.p.name}', '${req.body.p.dDate}', 1203, ${req.body.p.price}, ${client.typeID}, '${req.body.p.description}', '${req.body.p.image}','N')`)
+    var q = await connection.query(`INSERT INTO ebdb.Project(Project_Name, Due_Date, Order_Price, Client_ID, Project_Description, Project_Image, IsApproved)
+    VALUES ('${req.body.p.name}', '${req.body.p.dDate}', ${req.body.p.price}, ${client.typeID}, '${req.body.p.description}', '${req.body.p.image}','P')`)
 
     res.redirect('/')
 
@@ -267,9 +267,12 @@ app.get('/logout', async (req, res) => {
 
 app.get('/employees', async (req, res) => {
 
+    var emps = await connection.query('SELECT Employee_Name AS name, Employee_Position AS position, Hire_Date AS hiredate, Employee_ID AS id FROM ebdb.Employees')
+    var obj = {
+        employees: emps
+    }
 
-
-    res.render('employees_page');
+    res.render('employees_page', { obj, obj });
 })
 
 app.post('/newEmployee', async (req, res) => {
@@ -286,6 +289,15 @@ app.post('/newEmployee', async (req, res) => {
     ));`)
 
     res.redirect('employees')
+
+})
+
+app.post('/deleteemployee', async (req, res) => {
+
+    console.log(req.body)
+
+    var q = await connection.query(`DELETE FROM ebdb.Employees WHERE Employee_ID = ${req.body.fEmployee}`)
+    res.redirect('/employees')
 
 })
 
@@ -337,7 +349,7 @@ app.post('/', async function (req, res) {
 app.get('/pending-projects', async function (req, res) {
 
     var aEmployees = await connection.query('SELECT e.Employee_Name AS name, e.Employee_ID AS id FROM ebdb.Employees e;')
-    var pProjects = await connection.query("SELECT p.Project_ID AS projectid, p.Project_Image AS image, p.Project_Name AS title, p.Deliver_Date AS duedate, p.Project_Description AS description, p.Order_Price AS price FROM ebdb.Project p WHERE p.IsApproved = 'N';")
+    var pProjects = await connection.query("SELECT p.Project_ID AS projectid, p.Project_Image AS image, p.Project_Name AS title, p.Due_Date AS duedate, p.Project_Description AS description, p.Order_Price AS price FROM ebdb.Project p WHERE p.IsApproved = 'N';")
 
     var obj = {
         employees: aEmployees,

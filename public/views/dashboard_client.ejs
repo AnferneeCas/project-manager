@@ -110,26 +110,35 @@
 
 
 
-          <a href="./project-page/<%=project.projectid%>" class="card col-md-3 project-card"
-            style="text-decoration: none;color: black !important; max-width: 300px; margin-right: 5%; margin-top:2.5%; padding:0 !important; ">
-            <img src="<%=project.projectimage%>" class="card-img-top" alt="...">
-            <div class="card-body">
-              <h5 class="card-title"><%=project.title%></h5>
-              <p class="card-text"><%=project.description%>
-                <p class="card-text">Status: <span class="badge badge-danger">Rejected</span> </p>
-            </div>
-            <div class="card-footer">
-              <div class="row justify-content-center">
-
-
-
-
-
-
+          <a href="./project-page/<%=project.projectid%>" onclick='return <% if(project.approved!='Y'){%><%=false%> <%}%>'
+              class="card col-md-3 project-card"
+              style="text-decoration: none;color: black !important; max-width: 300px; margin-right: 5%; margin-top:2.5%; padding:0 !important; ">
+              <img src="<%=project.projectimage%>" class="card-img-top" alt="...">
+              <div class="card-body">
+                <h5 class="card-title"><%=project.title%></h5>
+                <p class="card-text"><%=project.description%>
+                  <p class="card-text">Status: 
+                    <% if(project.approved=='Y'){ %>
+                       <span class="badge badge-success">Accepted</span> 
+                     <% } else if(project.approved=='N'){ %>
+                      <span class="badge badge-danger">Rejected</span> 
+                     <% }else{ %>
+                      <span class="badge badge-warning">Review process</span>
+                     <% } %>
+                  </p>
               </div>
-            </div>
-          </a>
-          <% })%>
+              <div class="card-footer">
+                <div class="row justify-content-center">
+  
+  
+  
+  
+  
+  
+                </div>
+              </div>
+            </a>
+            <% })%>
 
 
 
