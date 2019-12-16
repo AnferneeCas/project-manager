@@ -137,14 +137,15 @@
 
 
         <div>
-          <form>
+          <form method="POST" action="/addTask">
             <div class="form-group">
               <label for="exampleFormControlInput1">Title</label>
-              <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="DO SOMETHING">
+              <input name="task[name]" type="text" class="form-control" id="exampleFormControlInput1"
+                placeholder="DO SOMETHING">
             </div>
             <div class="form-group">
               <label for="exampleFormControlSelect1">Select the owner</label>
-              <select class="form-control" id="exampleFormControlSelect1">
+              <select name="task[employee]" class="form-control" id="exampleFormControlSelect1">
                 <% obj.teammembers.forEach(function(member){ %>
                 <option value="<%=member.id%>"><%=member.name%></option>
 
@@ -152,21 +153,22 @@
               </select>
             </div>
 
+            <input style="display: none;" type="text" value='<%=obj.teammembers[0].P_ID%>' name="pID">
+
             <div class="form-group">
               <label for="exampleFormControlTextarea1">Description</label>
-              <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+              <textarea name="task[description]" class="form-control" id="exampleFormControlTextarea1"
+                rows="3"></textarea>
             </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary btn-change">Add</button>
+            </div>
+
           </form>
         </div>
 
-
-
-
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary btn-change">Add</button>
-        </div>
       </div>
     </div>
   </div>

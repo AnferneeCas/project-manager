@@ -187,14 +187,15 @@ app.get('/project-page/:projectid', async function (req, res) {
 
 
 
-        var members = await connection.query('SELECT e.Employee_Name AS name, e.Employee_ID AS id FROM ebdb.Employees e INNER JOIN ebdb.Project_x_Employee pe ON pe.E_ID = e.Employee_ID INNER JOIN ebdb.Project p ON pe.P_ID = p.Project_ID WHERE p.Project_ID = ' + req.params.projectid + ';')
+        var members = await connection.query('SELECT e.Employee_Name AS name, e.Employee_ID AS id, pe.P_ID FROM ebdb.Employees e INNER JOIN ebdb.Project_x_Employee pe ON pe.E_ID = e.Employee_ID INNER JOIN ebdb.Project p ON pe.P_ID = p.Project_ID WHERE p.Project_ID = ' + req.params.projectid + ';')
         var pImage = await connection.query('SELECT p.Project_Image AS image FROM ebdb.Project p WHERE p.Project_ID = ' + req.params.projectid + ';')
         var pTitle = await connection.query('SELECT p.Project_Name AS title FROM ebdb.Project p WHERE p.Project_ID = ' + req.params.projectid + ';')
         var tasksNumber = await connection.query('SELECT COUNT(t.Task_ID) AS number FROM ebdb.Tasks t INNER JOIN ebdb.Project p ON p.Project_ID = t.Project_ID WHERE p.Project_ID = ' + req.params.projectid + ';')
         var tasksDone = await connection.query("SELECT COUNT(t.Task_ID) AS tDone FROM ebdb.Tasks t WHERE t.Task_Status = 'Done' AND t.Project_ID = " + req.params.projectid + ";")
         var bugs = await connection.query('SELECT COUNT(b.Bug_Name) AS bNumber FROM ebdb.Bugs b INNER JOIN ebdb.Task_x_Bug tb ON tb.Bug_Name = b.Bug_Name INNER JOIN ebdb.Tasks t ON t.Task_ID = tb.Task_ID WHERE t.Project_ID = ' + req.params.projectid + ';')
         var bugsFixed = await connection.query("SELECT COUNT(b.Bug_Name) AS unsolved FROM ebdb.Bugs b INNER JOIN ebdb.Task_x_Bug tb ON tb.Bug_Name = b.Bug_Name INNER JOIN ebdb.Tasks t on t.Task_ID = tb.Task_ID WHERE t.Task_ID = " + req.params.projectid + " AND b.Bug_Status = 'Solved';")
-        //var tHistory = await connection.query('');
+        var tHistory = await connection.query(`SELECT t.Task_ID as id, e.Employee_Name as owner, t.Task_Name as title, t.Task_Status as status FROM ebdb.Tasks t INNER JOIN ebdb.Task_x_Employee te ON te.Task_ID = t.Task_ID 
+        INNER JOIN ebdb.Employees e ON te.Employee_ID = e.Employee_ID WHERE t.Project_ID = ${req.params.projectid};`);
 
         var obj = {
             projectimage: pImage[0].image,
@@ -208,7 +209,7 @@ app.get('/project-page/:projectid', async function (req, res) {
             bugbar: 0,
             teammembers: members,
             userType: userLogged.userType,
-            taskhistory: [{ id: 1, owner: "Anfernee castillo", title: "Create login", status: "warning" }, { id: 1, owner: "Anfernee castillo", title: "Create login", status: "done" }]
+            taskhistory: tHistory
 
         }
 
@@ -229,6 +230,20 @@ app.get('/project-page/:projectid', async function (req, res) {
     } else {
         res.redirect('/');
     }
+
+})
+
+app.post('/addTask', async (req, res) => {
+
+    console.log(req.body)
+
+    await connection.query(`INSERT INTO ebdb.Tasks(Task_Name, Task_Instructions, Project_ID, Task_Status)
+    VALUES('${req.body.task.name}', '${req.body.task.description}', ${req.body.pID}, 'pending');`)
+
+    await connection.query(`INSERT INTO ebdb.Task_x_Employee(Task_ID, Employee_ID)
+    VALUES ((SELECT t.Task_ID FROM ebdb.Tasks t WHERE t.Task_Name = '${req.body.task.name}'), ${req.body.task.employee});`)
+
+    res.redirect(`/project-page/${req.body.pID}`)
 
 })
 
