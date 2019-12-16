@@ -15,16 +15,16 @@ const express = require('express'),
 
 const jwt = require('jsonwebtoken')
 
-// ALTER SESSION SET "_ORACLE_SCRIPT" = true;
+// ALTER SESSION SET "_ORACLE_SCRIPT" = true;  PRIMERO
 
-// CREATE USER cuenta IDENTIFIED BY cuenta;
+// CREATE USER cuenta IDENTIFIED BY cuenta
 // DEFAULT TABLESAPCE "USERS"
-// temporary tablesapce "TMP"
+// temporary tablesapce "TEMP";
 
-// alter user cuenta quota unlimited on USERS
+// alter user cuenta quota unlimited on USERS SEGUNDO
 
-// grant create table to cuenta;
-// grant create session to cuenta;
+// grant create table to cuenta
+// grant create session to cuenta
 
 // alter session set current_schema = cuenta;
 
@@ -80,6 +80,7 @@ app.get('/', async function (req, res) {
             var bugs = await connection.query(`SELECT COUNT(b.Bug_Name) AS bCount FROM ebdb.Bugs b INNER JOIN ebdb.Task_x_Bug tb ON b.Bug_Name = tb.Bug_Name INNER JOIN ebdb.Tasks t ON tb.Task_ID = t.Task_ID INNER JOIN ebdb.Task_x_Employee te ON te.Task_ID = t.Task_ID WHERE te.Employee_ID = '${empID[0].Employee_ID}';`)
 
             var obj = {
+                EmpID: empID[0].Employee_ID,
                 projects_count: pCount[0].pc,
                 tasks_count: tCount[0].tc,
                 bugs_count: bugs[0].bCount,
@@ -249,6 +250,20 @@ app.post('/addTask', async (req, res) => {
 
 })
 
+app.post('/deleteTask', async function (req, res) {
+
+    await connection.query(`DELETE b FROM ebdb.Bugs b INNER JOIN ebdb.Task_x_Bug tb ON b.Bug_Name = tb.Bug_Name WHERE tb.Task_ID = ${req.body.tDeleteID};`)
+
+    await connection.query(`DELETE FROM ebdb.Task_x_Bug WHERE Task_ID = ${req.body.tDeleteID};`)
+
+    await connection.query(`DELETE FROM ebdb.Task_x_Employee WHERE Task_ID = ${req.body.tDeleteID};`)
+
+    await connection.query(`DELETE FROM ebdb.Tasks WHERE Task_ID = ${req.body.tDeleteID};`)
+
+    res.redirect('/project-page/' + req.body.pID)
+
+})
+
 app.get("/task-page/:taskid", async function (req, res) {
 
     var tQuery = await connection.query(`SELECT t.Project_ID, t.Task_Name, t.Task_Instructions, t.Task_Status FROM ebdb.Tasks t WHERE t.Task_ID = ${req.params.taskid}`)
@@ -275,7 +290,7 @@ app.post('/markTaskDone', async function (req, res) {
 
     await connection.query(`UPDATE ebdb.Bugs b INNER JOIN ebdb.Task_x_Bug tb ON b.Bug_Name = tb.Bug_Name
     SET Bug_Status = 'done'
-    WHERE tb.Task_ID = ${req.body.tID}`)
+    WHERE tb.Task_ID = ${req.body.tID};`)
 
     res.redirect('project-page/' + req.body.pID)
 
@@ -300,21 +315,12 @@ app.post('/reportBug', async function (req, res) {
 
 })
 
-app.get("/tasks", async function (req, res) {
+app.get("/tasks/:empid", async function (req, res) {
 
-    var aTasks = await connection.query('');
+    var tks = await connection.query(`SELECT t.Task_Name as tasktitle, p.Project_Name as projecttitle, t.Task_Instructions AS taskdescription, t.Task_ID AS taskid, t.Project_ID as projectid
+    FROM ebdb.Task_x_Employee te INNER JOIN ebdb.Tasks t ON te.Task_ID = t.Task_ID INNER JOIN ebdb.Project p ON t.Project_ID = p.Project_ID WHERE te.Employee_ID = ${req.params.empid};`)
 
-    // var obj = {
-    //       projectid: Tasks[i].Project_ID,
-    //         projecttitle: await getProjectNameByID(Tasks[i].Project_ID),
-    //         taskid: Tasks[i].Task_ID,
-    //         tasktitle: Tasks[i].Task_Name,
-    //         tasksdescription: Tasks[i].Task_Instructions,
-    //         currentstatus: 'In Process'
-    // }
-    var tmp = await getTasks();
-    console.log('test');
-    res.render('tasks', { obj: tmp[0] })
+    res.render('tasks', { obj: tks })
 })
 
 app.get('/logout', async (req, res) => {

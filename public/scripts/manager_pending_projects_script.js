@@ -60,6 +60,4 @@ btnChanges.addEventListener('click', function (ev) {
     }
 
     fetch('/acceptProject', options)
-    ev.preventDefault();
-
 })

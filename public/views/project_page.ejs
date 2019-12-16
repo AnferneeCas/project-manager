@@ -214,7 +214,11 @@
                                                     <td>
                                                         <button class="btn btn-sm btn-info" onclick="document.location ='/task-page/<%=task.id%>'">View</button>
               <%if(obj.userType=='M'){%>
-              <button class="btn  btn-sm btn-danger" type="submit">Delete</button>
+              <form method="POST" action="/deleteTask">
+                <input style="display: none;" type="text" value='<%= obj.teammembers[0].P_ID %>' name="pID">
+                <input style="display: none;" type="text" value='<%=task.id%>' name="tDeleteID">
+                <button class="btn  btn-sm btn-danger" type="submit">Delete</button>
+              </form>
               <%}%>
                                                     </td>
                                                     
