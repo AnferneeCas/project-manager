@@ -90,7 +90,7 @@ app.get('/', async function (req, res) {
 
         } else if (userLogged.userType == 'M') {
 
-            var pCount = await connection.query('SELECT COUNT(p.Project_ID) AS pc FROM ebdb.Project p;')
+            var pCount = await connection.query("SELECT COUNT(p.Project_ID) AS pc FROM ebdb.Project p WHERE p.IsApproved = 'Y';")
             var eCount = await connection.query('SELECT COUNT(t.Employee_ID) as ec FROM ebdb.Employees t;')
             var pPage = await connection.query("SELECT p.Project_Image AS projectimage, p.Project_ID as projectid, p.Project_Name as title, p.Project_Description as description,count(t.Project_ID) as QtyTasks, count(tb.Bug_Name) as Bugs FROM ebdb.Project p left join ebdb.Tasks t on p.Project_ID = t.Project_ID left join ebdb.Task_x_Bug tb on t.Task_ID = tb.Task_ID WHERE p.IsApproved = 'Y' group by  p.Project_Image, p.Project_ID, p.Project_Name, p.Project_Description")
             var obj = {
@@ -241,22 +241,63 @@ app.post('/addTask', async (req, res) => {
     VALUES('${req.body.task.name}', '${req.body.task.description}', ${req.body.pID}, 'pending');`)
 
     await connection.query(`INSERT INTO ebdb.Task_x_Employee(Task_ID, Employee_ID)
-    VALUES ((SELECT t.Task_ID FROM ebdb.Tasks t WHERE t.Task_Name = '${req.body.task.name}'), ${req.body.task.employee});`)
+    VALUES ((SELECT t.Task_ID FROM ebdb.Tasks t WHERE t.Task_Name = '${req.body.task.name}' AND 
+    t.Task_Instructions = '${req.body.task.description}' AND t.Project_ID  = ${req.body.pID}),
+    ${req.body.task.employee});`)
 
     res.redirect(`/project-page/${req.body.pID}`)
 
 })
 
-app.get("/task-page/:taskid", function (req, res) {
+app.get("/task-page/:taskid", async function (req, res) {
+
+    var tQuery = await connection.query(`SELECT t.Project_ID, t.Task_Name, t.Task_Instructions, t.Task_Status FROM ebdb.Tasks t WHERE t.Task_ID = ${req.params.taskid}`)
+    var bug = await connection.query(`SELECT b.Bug_Name AS id, b.Bug_Status AS status, b.Bug_Description as description, b.Date_Reported as date FROM ebdb.Bugs b
+    INNER JOIN ebdb.Task_x_Bug tb ON b.Bug_Name = tb.Bug_Name WHERE tb.Task_ID = ${req.params.taskid};
+    `)
 
     var obj = {
-        projectid: "1",
-        id: "1",
-        title: "Title",
-        description: "This is a description",
-        activityhistory: [{ id: 1, author: "autor", subject: "subject", status: "error", date: "12/11/19", timelapsed: "23:00 - 24:00", description: "this is a big description" }]
+        projectid: tQuery[0].Project_ID,
+        id: req.params.taskid,
+        title: tQuery[0].Task_Name,
+        description: tQuery[0].Task_Instructions,
+        status: tQuery[0].Task_Status,
+        activityhistory: bug
     }
     res.render('task_page', { obj: obj })
+})
+
+app.post('/markTaskDone', async function (req, res) {
+
+    await connection.query(`UPDATE ebdb.Tasks
+    SET Task_Status = 'done'
+    WHERE Task_ID = ${req.body.tID}`)
+
+    await connection.query(`UPDATE ebdb.Bugs b INNER JOIN ebdb.Task_x_Bug tb ON b.Bug_Name = tb.Bug_Name
+    SET Bug_Status = 'done'
+    WHERE tb.Task_ID = ${req.body.tID}`)
+
+    res.redirect('project-page/' + req.body.pID)
+
+})
+
+app.post('/reportBug', async function (req, res) {
+
+    var today = new Date()
+    var date = today.getFullYear() + '/' + (today.getMonth() + 1) + '/' + today.getDate()
+
+    await connection.query(`INSERT INTO ebdb.Bugs(Bug_Name, Bug_Description, Date_Reported, Date_Solved, Bug_Status)
+    VALUES ('${req.body.bug.name}', '${req.body.bug.description}', '${date}', '${req.body.bug.solved}', 'pending');`)
+
+    await connection.query(`INSERT INTO ebdb.Task_x_Bug(Bug_Name, Task_ID)
+    VALUES('${req.body.bug.name}', ${req.body.tID})`)
+
+    await connection.query(`UPDATE ebdb.Tasks
+    SET Task_Status = 'error'
+    WHERE Task_ID = ${req.body.tID}`)
+
+    res.redirect('/task-page/' + req.body.tID)
+
 })
 
 app.get("/tasks", async function (req, res) {
@@ -312,7 +353,9 @@ app.post('/deleteemployee', async (req, res) => {
 
     console.log(req.body)
 
-    var q = await connection.query(`DELETE FROM ebdb.Employees WHERE Employee_ID = ${req.body.fEmployee}`)
+    await connection.query(`DELETE FROM ebdb.Users WHERE Employee_ID = ${req.body.fEmployee}`)
+    await connection.query(`DELETE FROM ebdb.Project_x_Employee WHERE E_ID = ${req.body.fEmployee}`)
+    await connection.query(`DELETE FROM ebdb.Employees WHERE Employee_ID = ${req.body.fEmployee}`)
     res.redirect('/employees')
 
 })
@@ -439,14 +482,13 @@ function isLogged(x) {
 
 
 
-{/* <div class="col-md-4" style=" border: 2px black solid;">
-
-<span> <img src="../images/tasks_icon.png" style=" max-width:40px; " alt=""></span>
-<span style="padding-left:0.7em ;"><%= project.QtyTasks %></span>
-</div>
-
-<div class="col-md-4" style=" border: 2px black solid;">
-
-<span> <img src="../images/error_icon.png" style=" max-width:40px; " alt=""></span>
-<span style="padding-left:0.7em ;"><%= project.Bugs %></span>
-</div> */}
+{/* <div class="form-group">
+                  <label for="exampleFormControlSelect1">Status</label>
+                  <select class="form-control" id="exampleFormControlSelect1">
+                    <option>Pending</option>
+                    <option>Completed</option>
+                    <option>Warning</option>
+                    <option>4</option>
+                    <option>5</option>
+                  </select>
+                </div> */}

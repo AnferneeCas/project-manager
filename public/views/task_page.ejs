@@ -65,9 +65,16 @@
       <p class="card-text"> <%= obj.description%></p>
     </div>
     <div class="card-footer bg-transparent ">
-      <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
-        Add Activity
+      <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal">
+        Report Bug
       </button>
+      <form method="POST" action="/markTaskDone">
+        <input style="display: none;" type="text" value='<%=obj.id%>' name="tID">
+        <input style="display: none;" type="text" value='<%=obj.projectid%>' name="pID">
+        <button type="submit" class="btn btn-success">
+          Mark task as done
+        </button>
+      </form>
       <a href="/project-page/<%=obj.projectid%>" class="btn btn-primary">View project page</a>
 
 
@@ -78,63 +85,45 @@
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">New Activity</h5>
+              <h5 class="modal-title" id="exampleModalLabel">New Bug</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
             <div class="modal-body">
 
-              <form>
+              <form method="POST" action="/reportBug">
                 <div class="form-group">
-                  <label for="exampleFormControlInput1">Subject</label>
-                  <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="">
-                </div>
-                <div class="form-group">
-                  <label for="exampleFormControlSelect1">Status</label>
-                  <select class="form-control" id="exampleFormControlSelect1">
-                    <option>Pending</option>
-                    <option>Completed</option>
-                    <option>Warning</option>
-                    <option>4</option>
-                    <option>5</option>
-                  </select>
+                  <label for="exampleFormControlInput1">Bug Name</label>
+                  <input name="bug[name]" type="text" class="form-control" id="exampleFormControlInput1" placeholder="">
                 </div>
 
                 <div class="form-group">
                   <div class="container-fluid">
                     <div class="row">
                       <div class="col-md-12">
-                        <label for="inputMDEx1">Date</label>
-                        <input type="date" id="inputMDEx1" class="form-control">
-                      </div>
-                      <div class="col-md-4">
-                        <label for="inputMDEx1">Start</label>
-                        <input type="time" id="inputMDEx1" class="form-control">
-                      </div>
-
-                      <div class="col-md-4">
-                        <label for="inputMDEx1">End</label>
-                        <input type="time" id="inputMDEx1" class="form-control">
+                        <label for="inputMDEx1">Date to be solved</label>
+                        <input name="bug[solved]" type="date" id="inputMDEx1" class="form-control">
                       </div>
                     </div>
-
-
                   </div>
-
                 </div>
-
                 <div class="form-group">
-                  <label for="exampleFormControlTextarea1">Description textarea</label>
-                  <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                  <label for="exampleFormControlTextarea1">Bug Description</label>
+                  <textarea name="bug[description]" class="form-control" id="exampleFormControlTextarea1"
+                    rows="3"></textarea>
                 </div>
+
+                <input style="display: none;" type="text" value='<%=obj.id%>' name="tID">
+
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+
               </form>
 
 
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary">Add</button>
             </div>
           </div>
         </div>
@@ -158,12 +147,9 @@
       <table class="table table-hover table-dark">
         <thead>
           <tr>
-            <th scope="col" style="text-align: center;">Id</th>
-            <th scope="col" style="text-align: center;">Author</th>
-            <th scope="col" style="text-align: center;">Subject</th>
+            <th scope="col" style="text-align: center;">Bug Name</th>
             <th scope="col" style="text-align: center;">Status</th>
             <th scope="col" style="text-align: center;">Date</th>
-            <th scope="col" style="text-align: center;">Time-lapsed</th>
             <th scope="col" style="text-align: center;">Description</th>
           </tr>
         </thead>
@@ -172,16 +158,13 @@
           <% obj.activityhistory.forEach(function(activity){ %>
           <tr>
             <th scope="row"><%= activity.id%></th>
-            <td><%= activity.author%></td>
-            <td><%= activity.subject%></td>
             <td>
-              <%if(task.status=='error'){%>
+              <%if(activity.status=='error'){%>
               <span class="badge badge-danger">Error</span>
-              <%} else if(task.status=='pending') {%>
-              <span class="badge badge-warning">In process</span>
-
-              <%} else if(task.status=='done') {%>
-              <span class="badge badge-success">Done</span>
+              <%} else if(activity.status=='pending') {%>
+              <span class="badge badge-warning">Solving</span>
+              <%} else if(activity.status=='done') {%>
+              <span class="badge badge-success">Solved</span>
 
               <%}%>
                                                 
@@ -189,9 +172,6 @@
                                             </td>
                                             <td>
                                                 <%= activity.date%>
-            </td>
-            <td>
-              <%= activity.timelapsed%>
             </td>
             <td scope="row">
 
