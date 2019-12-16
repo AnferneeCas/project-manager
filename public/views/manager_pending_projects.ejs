@@ -106,7 +106,7 @@
                 </div>
 
                 <form action="">
-                    
+
                   <div class="form-group">
                     <label for="exampleFormControlTextarea1">Description</label>
                     <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
@@ -148,14 +148,18 @@
             <div class="card-footer">
               <div class="row ">
                 <div class="col-md-6">
-                  <button type="button" class="btn btn-success accept-button" data-toggle="modal"
-                    data-target="#exampleModalCenter">
+                  <button type="button" class="btn btn-success accept-button" projectid='<%=project.projectid%>'
+                    data-toggle="modal" data-target="#exampleModalCenter">
                     Accept
                   </button>
                 </div>
 
                 <div class="col-md-6">
-                  <button class="btn btn-danger accept-button" data-toggle="modal" data-target="#exampleModalCenterReject">Reject</button>
+                  <form method="POST" action="/rejectProject">
+                    <input style="display: none;" type="text" value='<%=project.projectid%>' name="rProject">
+                    <button class="btn btn-danger reject-button" projectid='<%=project.projectid%>' data-toggle="modal"
+                      data-target="#exampleModalCenterReject">Reject</button>
+                  </form>
                 </div>
 
 

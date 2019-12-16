@@ -72,9 +72,9 @@
                   <td><%=employee.hiredate%></td>
 
                   <td style="text-align: center;">
-                    <form method='POST' action="/deleteemployee"><input style="display: none;" type="text"
-                        value='<%=employee.id%>' name="fEmployee"><button type="submit"
-                        class="btn btn-sm btn-danger">FIRE</button>
+                    <form method='POST' action="/deleteemployee">
+                      <input style="display: none;" type="text" value='<%=employee.id%>' name="fEmployee">
+                      <button type="submit" class="btn btn-sm btn-danger">FIRE</button>
                     </form>
                   </td>
                 </tr>

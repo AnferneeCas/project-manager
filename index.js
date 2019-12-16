@@ -31,6 +31,7 @@ const jwt = require('jsonwebtoken')
 //Configuration and declaration
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cookieParser())
+app.use(express.json())
 const private_key = 'arturoyanfer'
 const payload = {
     username: 'r2rendon',
@@ -73,8 +74,8 @@ app.get('/', async function (req, res) {
         if (userLogged.userType == 'E') {
 
             var empID = await connection.query(`SELECT u.Employee_ID FROM ebdb.Users u WHERE u.Username = '${userLogged.username}'`)
-            var pPage = await connection.query(`SELECT p.Project_Name AS title, p.Project_Description AS description, p.Project_Image AS projectimage, p.Project_ID AS projectid FROM ebdb.Project p INNER JOIN ebdb.Project_x_Employee pe ON p.Project_ID = pe.Project_ID WHERE pe.Employee_ID = '${empID[0].Employee_ID}';`)
-            var pCount = await connection.query(`SELECT COUNT(p.Project_ID) AS pc FROM ebdb.Project p INNER JOIN ebdb.Project_x_Employee pe ON p.Project_ID = pe.Project_ID WHERE pe.Employee_ID = '${empID[0].Employee_ID}';`)
+            var pPage = await connection.query(`SELECT p.Project_Name AS title, p.Project_Description AS description, p.Project_Image AS projectimage, p.Project_ID AS projectid FROM ebdb.Project p INNER JOIN ebdb.Project_x_Employee pe ON p.Project_ID = pe.P_ID WHERE pe.E_ID = '${empID[0].Employee_ID}';`)
+            var pCount = await connection.query(`SELECT COUNT(p.Project_ID) AS pc FROM ebdb.Project p INNER JOIN ebdb.Project_x_Employee pe ON p.Project_ID = pe.P_ID WHERE pe.E_ID = '${empID[0].Employee_ID}';`)
             var tCount = await connection.query(`SELECT COUNT(t.Task_ID) AS tc FROM ebdb.Tasks t INNER JOIN ebdb.Task_x_Employee te ON te.Task_ID = t.Task_ID WHERE te.Employee_ID = ${empID[0].Employee_ID};`)
             var bugs = await connection.query(`SELECT COUNT(b.Bug_Name) AS bCount FROM ebdb.Bugs b INNER JOIN ebdb.Task_x_Bug tb ON b.Bug_Name = tb.Bug_Name INNER JOIN ebdb.Tasks t ON tb.Task_ID = t.Task_ID INNER JOIN ebdb.Task_x_Employee te ON te.Task_ID = t.Task_ID WHERE te.Employee_ID = '${empID[0].Employee_ID}';`)
 
@@ -186,7 +187,7 @@ app.get('/project-page/:projectid', async function (req, res) {
 
 
 
-        var members = await connection.query('SELECT e.Employee_Name AS name, e.Employee_ID AS id FROM ebdb.Employees e INNER JOIN ebdb.Project_x_Employee pe ON pe.Employee_ID = e.Employee_ID INNER JOIN ebdb.Project p ON pe.Project_ID = p.Project_ID WHERE p.Project_ID = ' + req.params.projectid + ';')
+        var members = await connection.query('SELECT e.Employee_Name AS name, e.Employee_ID AS id FROM ebdb.Employees e INNER JOIN ebdb.Project_x_Employee pe ON pe.E_ID = e.Employee_ID INNER JOIN ebdb.Project p ON pe.P_ID = p.Project_ID WHERE p.Project_ID = ' + req.params.projectid + ';')
         var pImage = await connection.query('SELECT p.Project_Image AS image FROM ebdb.Project p WHERE p.Project_ID = ' + req.params.projectid + ';')
         var pTitle = await connection.query('SELECT p.Project_Name AS title FROM ebdb.Project p WHERE p.Project_ID = ' + req.params.projectid + ';')
         var tasksNumber = await connection.query('SELECT COUNT(t.Task_ID) AS number FROM ebdb.Tasks t INNER JOIN ebdb.Project p ON p.Project_ID = t.Project_ID WHERE p.Project_ID = ' + req.params.projectid + ';')
@@ -349,7 +350,7 @@ app.post('/', async function (req, res) {
 app.get('/pending-projects', async function (req, res) {
 
     var aEmployees = await connection.query('SELECT e.Employee_Name AS name, e.Employee_ID AS id FROM ebdb.Employees e;')
-    var pProjects = await connection.query("SELECT p.Project_ID AS projectid, p.Project_Image AS image, p.Project_Name AS title, p.Due_Date AS duedate, p.Project_Description AS description, p.Order_Price AS price FROM ebdb.Project p WHERE p.IsApproved = 'N';")
+    var pProjects = await connection.query("SELECT p.Project_ID AS projectid, p.Project_Image AS image, p.Project_Name AS title, p.Due_Date AS duedate, p.Project_Description AS description, p.Order_Price AS price FROM ebdb.Project p WHERE p.IsApproved = 'P';")
 
     var obj = {
         employees: aEmployees,
@@ -359,6 +360,30 @@ app.get('/pending-projects', async function (req, res) {
     res.render('manager_pending_projects', { obj: obj });
 });
 
+app.post('/acceptProject', async (req, res) => {
+
+    console.log(req.body)
+
+    await connection.query(`UPDATE ebdb.Project
+    SET IsApproved = 'Y'
+    WHERE Project_ID = ${req.body.pID};`)
+
+    for (var i = 0; i < req.body.pMembers.length; i++)
+        await connection.query(`INSERT INTO ebdb.Project_x_Employee(P_ID, E_ID)
+        VALUES (${req.body.pID}, ${req.body.pMembers[i]})`)
+
+    res.redirect('/')
+
+})
+
+app.post('/rejectProject', async (req, res) => {
+    await connection.query(`UPDATE ebdb.Project
+    SET IsApproved = 'R'
+    WHERE Project_ID = ${req.body.rProject};`)
+
+    res.redirect('/pending-projects')
+
+})
 
 app.get('/register', async function (req, res) {
     res.render('register_client')
