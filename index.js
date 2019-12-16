@@ -266,7 +266,27 @@ app.get('/logout', async (req, res) => {
 })
 
 app.get('/employees', async (req, res) => {
+
+
+
     res.render('employees_page');
+})
+
+app.post('/newEmployee', async (req, res) => {
+
+    var today = new Date();
+    var date = today.getFullYear() + '/' + (today.getMonth() + 1) + '/' + today.getDate()
+
+    var iEmployee = await connection.query(`INSERT INTO ebdb.Employees(Employee_Name, Employee_Position, Hire_Date)
+    VALUES('${req.body.employee.name}', '${req.body.employee.position}', '${date}');`)
+
+    var iUser = await connection.query(`INSERT INTO ebdb.Users(Username, Password, Email, Employee_ID)
+    VALUES('${req.body.employee.user}', '${req.body.employee.pass}', '${req.body.employee.email}', (
+        SELECT e.Employee_ID FROM ebdb.Employees e WHERE e.Employee_Name = '${req.body.employee.name}'
+    ));`)
+
+    res.redirect('employees')
+
 })
 
 app.post('/', async function (req, res) {
@@ -279,7 +299,6 @@ app.post('/', async function (req, res) {
     try {
         userQuery[0].Employee_ID
     } catch (e) {
-
         res.redirect('/')
     }
 

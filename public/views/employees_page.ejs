@@ -44,42 +44,49 @@
     <!-- Page Content -->
     <div id="page-content-wrapper">
       <div class="container-fluid">
-        
+
 
 
         <!-- BODY CONTENT -->
-        <div class="row"style="margin-top: 5%;" >
-                <div class="container-fluid">
-                    <button class="btn btn-success" style="margin-bottom: 1em;" data-toggle="modal" data-target="#exampleModalLong">Add an employee</button>
-                        <table class="table table-hover table-dark">
-                                <thead>
-                                  <tr>
-                                    <th scope="col" style="text-align: center;">Name</th>
-                                    <th scope="col" style="text-align: center;">Position</th>
-                                    <th scope="col" style="text-align: center;">Hire date</th>
-                                    <th scope="col" style="text-align: center;">Email</th>
-                                    <th scope="col" style="text-align: center;">Options</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                <td> </td>
+        <div class="row" style="margin-top: 5%;">
+          <div class="container-fluid">
+            <button class="btn btn-success" style="margin-bottom: 1em;" data-toggle="modal"
+              data-target="#exampleModalLong">Add an employee</button>
+            <table class="table table-hover table-dark">
+              <thead>
+                <tr>
+                  <th scope="col" style="text-align: center;">Name</th>
+                  <th scope="col" style="text-align: center;">Position</th>
+                  <th scope="col" style="text-align: center;">Hire date</th>
+                  <th scope="col" style="text-align: center;">Email</th>
+                  <th scope="col" style="text-align: center;">Options</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% obj.employees.forEach(function(employee){ %>
+                <tr>
+                  <td><%=employee.name%></td>
 
-                                <td>  </td>
+                  <td><%=employee.position%></td>
 
-                                <td> </td>
 
-                                <td></td>
-                                <td style="text-align: center;"> <button class="btn btn-sm btn-danger" >FIRE</button></td>
-                                 
-                                </tbody>
-                              </table>
-                </div>
-            </div>
+                  <td><%=employee.hiredate%></td>
+
+                  <td><%=employee.email%></td>
+
+                  <td style="text-align: center;"> <button class="btn btn-sm btn-danger">FIRE</button></td>
+                </tr>
+                <%})%>
+              </tbody>
+            </table>
+          </div>
+        </div>
 
         <!-- END BODY CONTENT -->
 
 
-        <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+        <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog"
+          aria-labelledby="exampleModalLongTitle" aria-hidden="true">
           <div class="modal-dialog" role="document">
             <div class="modal-content">
               <div class="modal-header">
@@ -89,38 +96,46 @@
                 </button>
               </div>
               <div class="modal-body">
-                <form>
-                  
+                <form method="POST" action="/newEmployee">
+
                   <div class="form-group">
                     <label for="exampleFormControlInput1">Employee name </label>
-                    <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="">
+                    <input type="text" class="form-control" id="exampleFormControlInput1" name="employee[name]">
                   </div>
                   <div class="form-group">
                     <label for="exampleFormControlSelect1">Position</label>
-                    <select class="form-control" id="exampleFormControlSelect1">
+                    <select name="employee[position]" class="form-control" id="exampleFormControlSelect1">
                       <option>Front-end</option>
                       <option>Back-end</option>
                       <option>Full-stack</option>
                     </select>
                   </div>
-                  
+
                   <div class="form-group">
                     <label for="exampleFormControlInput1">Email</label>
-                    <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="">
-                        
+                    <input name="employee[email]" type="text" class="form-control" id="exampleFormControlInput1"
+                      placeholder="">
+
+                  </div>
+
+                  <div class="form-group">
+                    <label for="exampleFormControlInput1">Username</label>
+                    <input type="text" class="form-control" id="exampleFormControlInput1" name="employee[user]">
                   </div>
 
                   <div class="form-group">
                     <label for="exampleFormControlInput1">Password</label>
-                    <input type="password" class="form-control" id="exampleFormControlInput1" placeholder="">
-                        
+                    <input name="employee[pass]" type="password" class="form-control" id="exampleFormControlInput1"
+                      placeholder="">
+
                   </div>
+
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-Primary">Create</button>
+                  </div>
+
                 </form>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-Primary" data-dismiss="modal">Create</button>
-                
               </div>
             </div>
           </div>
